@@ -1,0 +1,145 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Gruppo&family=Montserrat:wght@500&family=Rubik+Puddles&display=swap');
+
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    background-color: #24252A;
+}
+
+body {
+    height: calc(100vh - 140px);
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    
+}
+
+li, a {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #edf0f1;
+    text-decoration: none;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 10%;
+    height: 80px;
+
+
+}
+
+#logo {
+    font-family: "Gruppo", sans-serif;
+    color: #edf0f1;
+    font-weight: 700;
+    font-size: 25px;
+    cursor: pointer;
+    margin-right: auto;
+    transition: all 0.3s ease 0s;
+}
+
+#logo:hover {
+    color: purple;
+}
+
+
+.nav_links {
+    list-style: none;
+}
+
+.nav_links li {
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.nav_links li a {
+    transition: all 0.3s ease 0s;
+}
+
+.nav_links li a:hover {
+    color: #0088a9;
+}
+
+#main {
+    font-family: "Rubik Puddles", sans-serif;
+    display: flex;
+    justify-content: center;
+    font-size: 100px;
+    color: #edf0f1;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    margin-top: 60px;
+    padding-bottom: 100px;
+}
+
+#soon {
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+}
+#soon:hover {
+    color: yellowgreen;
+}
+
+
+.floating { 
+    animation-name: floating, opacity;
+    animation-duration: 3s;
+    animation-iteration-count: infinite, 1;
+    animation-timing-function: ease-in-out;
+    
+    
+}
+ 
+@keyframes floating {
+    0% { transform: translate(0,  0px); }
+    50%  { transform: translate(0, -50px); }
+    100%   { transform: translate(0, -0px); }   
+}
+
+
+.opacity {
+    animation-name: opacity;
+    animation-duration: 3s;
+    animation-iteration-count: 1;
+
+}
+
+@keyframes opacity {
+    0% {opacity: 0}
+    100% {opacity: 1}
+}
+
+
+.hover-underline-animation {
+    display: inline-block;
+    position: relative;
+    color: #0087ca;
+  }
+  
+  .hover-underline-animation::after{
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: #0087ca;
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+
+    
+  }
+  
+  .hover-underline-animation:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
