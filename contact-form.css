@@ -1,9 +1,9 @@
 /* CONTACT DESIGN */
 
 .contact-section {
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 4rem;
   }
 
   .contact-section h2 {
@@ -56,9 +56,10 @@
   .social-links {
     display: flex;
     justify-content: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    align-items: center;
+
   }
 
   .social-links a {
@@ -67,9 +68,7 @@
     color: #edf0f1;
   }
 
-  .social-links a:hover {
-    text-decoration: underline;
-  }
+  
 
   /* Utility class for accessible labels */
   .sr-only {
@@ -83,3 +82,7 @@
     white-space: nowrap;
     border: 0;
   }
+
+  .social-links a:hover {
+    color: #0088a9;
+}
