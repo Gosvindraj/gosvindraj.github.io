@@ -21,3 +21,12 @@ function typeWriter() {
 
 // kick it off once the DOM is ready
 document.addEventListener("DOMContentLoaded", typeWriter);
+
+//project page
+document.querySelectorAll(".more-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    const card = button.closest(".project-card");
+    card.classList.toggle("active");
+    button.textContent = card.classList.contains("active") ? "Less" : "More";
+  });
+});
