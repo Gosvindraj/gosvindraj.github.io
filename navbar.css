@@ -80,7 +80,7 @@ header {
 }
 
 .dropdown_menu.open {
-    height: 127px;
+    height: auto;
 }
 
 .dropdown_menu li {
