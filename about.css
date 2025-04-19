@@ -1,6 +1,6 @@
 #about {
     max-width: 800px;
-    margin: auto;
+    margin: 0 auto;
     text-align: center;
     font-family: sans-serif;
     height: 100%;
@@ -35,3 +35,16 @@
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0; }
   }
+
+
+  /* RESPONSIVE DESIGN */
+
+@media(max-width: 700px){
+  #about{
+      max-width: 300px;
+  }
+
+  .typewriter{
+      font-size: 25px;
+  }
+}
