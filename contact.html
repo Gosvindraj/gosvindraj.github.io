@@ -44,7 +44,7 @@
 
     <section id="contact" class="contact-section">
       <h2>Feel free to drop a message</h2>
-      <form action="/send-message" method="POST">
+      <form id="contact-form">
         <label for="name" class="sr-only">Name</label>
         <input
           type="text"
@@ -104,5 +104,10 @@
       </div>
     </section>
     <script src="script.js"></script>
+    <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+    <script>
+      // initialize with YOUR user‑ID (found under Integration → API Keys)
+      emailjs.init("nWphQI8z1ReghKuBL");
+    </script>
   </body>
 </html>

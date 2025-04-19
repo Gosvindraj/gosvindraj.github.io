@@ -30,3 +30,27 @@ document.querySelectorAll(".more-btn").forEach((button) => {
     button.textContent = card.classList.contains("active") ? "Less" : "More";
   });
 });
+
+//email js
+
+document
+  .getElementById("contact-form")
+  .addEventListener("submit", function (event) {
+    event.preventDefault(); // stop normal form post
+
+    emailjs
+      .sendForm(
+        "service_2fltq5k", // ← your Service ID
+        "template_uoi0y6r", // ← your Template ID
+        this // ← the form element
+      )
+      .then(
+        () => {
+          alert("✅ Message sent!");
+          this.reset();
+        },
+        (err) => {
+          alert("❌ Send failed: " + err.text);
+        }
+      );
+  });
