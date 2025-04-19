@@ -41,15 +41,17 @@
   .more-btn {
     background: var(--accent);
     color: #fff;
-    border: none;
+    border: 1px solid;
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
     cursor: pointer;
     transition: var(--transition);
+    border-color: #24252A;
   }
   .more-btn:hover {
     background: darken(var(--accent), 10%);
     color: var(--accent);
+    border: 1px solid #24252A;
   }
   .details {
     max-height: 0;
