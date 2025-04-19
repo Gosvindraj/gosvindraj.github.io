@@ -9,7 +9,8 @@
   .contact-section h2 {
     text-align: center;
     margin-bottom: 1.5rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    font-weight: normal;
   }
 
   .contact-section input,
@@ -17,7 +18,7 @@
     width: 100%;
     padding: 0.75rem;
     margin-bottom: 1rem;
-    border: 1px solid #ccc;
+    border: 3px solid #59595d;
     border-radius: 4px;
     font-size: 1rem;
   }
@@ -25,7 +26,8 @@
   .contact-section input:focus,
   .contact-section textarea:focus {
     outline: none;
-    border-color: #333;
+    border-color: #1539ee;
+    border-width: 3px;
   }
 
   .contact-section button {
@@ -34,7 +36,7 @@
     padding: 0.75rem;
     border: none;
     border-radius: 4px;
-    background: #333;
+    background: #000000;
     color: #fff;
     font-size: 1rem;
     cursor: pointer;
@@ -42,7 +44,7 @@
   }
 
   .contact-section button:hover {
-    background: #555;
+    background: #1a1717;
   }
 
   /*.disabled-link {
@@ -52,6 +54,11 @@
     cursor: default;
     opacity: 0.6;
   }*/
+
+  .social-links h4 {
+    font-weight: normal;
+     font-size: 1rem;
+  }
 
   .social-links {
     display: flex;
@@ -68,8 +75,6 @@
     color: #edf0f1;
   }
 
-  
-
   /* Utility class for accessible labels */
   .sr-only {
     position: absolute;
@@ -85,4 +90,19 @@
 
   .social-links a:hover {
     color: #0088a9;
+}
+
+@media(max-width: 700px){
+  .social-text{
+      display: none;
+  }
+
+  .fa-brands{
+      font-size: 3rem;
+      padding: 6px;
+  }
+
+  .social-links h4 {
+    display: none;
+  }
 }
