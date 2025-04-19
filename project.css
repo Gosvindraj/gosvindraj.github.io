@@ -1,0 +1,77 @@
+:root {
+    --card-bg: #8a629c;
+    --primary: #000000;
+    --accent: #24252A;
+    --radius: 8px;
+    --transition: 0.3s ease;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    color: var(--primary);
+    line-height: 1.6;
+  }
+
+ 
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .project-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform var(--transition), box-shadow var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(214, 85, 234, 0.15);
+  }
+  .project-card h3 {
+    margin-bottom: 0.5rem;
+  }
+  .project-card p {
+    margin-bottom: 1rem;
+  }
+  .more-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .more-btn:hover {
+    background: darken(var(--accent), 10%);
+    color: var(--accent);
+  }
+  .details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition);
+  }
+  .project-card.active .details {
+    max-height: 200px; /* adjust based on content length */
+    margin-top: 1rem;
+  }
+  .details a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--transition);
+  }
+  .details a:hover {
+    border-color: var(--accent);
+  }
+
+  #projects {
+    margin-top: 2rem;
+  }
