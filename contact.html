@@ -1,1 +1,102 @@
-<h1>This is the contact page</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Personal portfolio of Gosvindraj, AI enthusiast and developer."
+    />
+    <meta name="author" content="Gosvindraj" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="navbar.css" />
+    <link rel="stylesheet" href="contact-form.css" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Gosvindraj | Contact</title>
+  </head>
+
+  <body>
+    <header>
+      <a href="home.html"><div id="logo">GOSVINDRAJ</div></a>
+      <nav>
+        <ul class="nav_links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="toggle_btn">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+      <div class="dropdown_menu">
+        <li><a href="about.html">About</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </div>
+    </header>
+
+    <section id="contact" class="contact-section">
+      <h2>Contact Me</h2>
+      <form action="/send-message" method="POST">
+        <label for="name" class="sr-only">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Your Name"
+          required
+        />
+
+        <label for="email" class="sr-only">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Your Email"
+          required
+        />
+
+        <label for="message" class="sr-only">Message</label>
+        <textarea
+          id="message"
+          name="message"
+          rows="5"
+          placeholder="Your Message"
+          required
+        ></textarea>
+
+        <button type="submit">Send</button>
+      </form>
+
+      <!-- Social Media Links -->
+      <div class="social-links">
+        <a
+          href="https://www.linkedin.com/in/gosvindraj-m-3306b9280/"
+          target="_blank"
+          rel="noopener"
+          >LinkedIn
+        </a>
+        <a
+          href="https://www.instagram.com/gosv7ndraj/"
+          target="_blank"
+          rel="noopener"
+          >Instagram</a
+        >
+        <a
+          href="https://www.facebook.com/gosvindraj.fuzz/"
+          target="_blank"
+          rel="noopener"
+          >Facebook</a
+        >
+      </div>
+    </section>
+    <script src="script.js"></script>
+  </body>
+</html>

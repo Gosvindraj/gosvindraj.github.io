@@ -1,0 +1,85 @@
+/* CONTACT DESIGN */
+
+.contact-section {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .contact-section h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+  }
+
+  .contact-section input,
+  .contact-section textarea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .contact-section input:focus,
+  .contact-section textarea:focus {
+    outline: none;
+    border-color: #333;
+  }
+
+  .contact-section button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    background: #333;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .contact-section button:hover {
+    background: #555;
+  }
+
+  /*.disabled-link {
+    pointer-events: none;
+    color: gray;
+    text-decoration: none;
+    cursor: default;
+    opacity: 0.6;
+  }*/
+
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    
+  }
+
+  .social-links a {
+    font-size: 1rem;
+    text-decoration: none;
+    color: #edf0f1;
+  }
+
+  .social-links a:hover {
+    text-decoration: underline;
+  }
+
+  /* Utility class for accessible labels */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }

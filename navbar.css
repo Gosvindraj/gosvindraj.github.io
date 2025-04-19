@@ -1,0 +1,107 @@
+li, a {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #edf0f1;
+    text-decoration: none;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 10%;
+    height: 80px;
+
+
+}
+
+#logo {
+    font-family: "Gruppo", sans-serif;
+    color: #edf0f1;
+    font-weight: 700;
+    font-size: 25px;
+    cursor: pointer;
+    margin-right: auto;
+    transition: all 0.3s ease 0s;
+}
+
+#logo:hover {
+    color: purple;
+}
+
+
+.nav_links {
+    list-style: none;
+}
+
+.nav_links li {
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.nav_links li a {
+    transition: all 0.3s ease 0s;
+}
+
+.nav_links li a:hover {
+    color: #0088a9;
+}
+
+.toggle_btn {
+    color: #edf0f1;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display:none;
+}
+
+.toggle_btn:hover {
+    color: #0088a9;
+}
+
+
+/*DROPDOWN MENU */
+
+.dropdown_menu {
+    display: none;
+    position: absolute;
+    right: 2rem;
+    top: 85px;
+    width: 150px;
+    height: 0px;
+    list-style: none;
+    border-radius: 10px;
+    background-color:rgba(0, 0, 0, 1);
+    backdrop-filter: blur(1px);
+    z-index: 1;
+    transition: height 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+
+}
+
+.dropdown_menu.open {
+    height: 127px;
+}
+
+.dropdown_menu li {
+    padding: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media(max-width: 700px){
+    .nav_links{
+        display:none;
+    }
+
+    .toggle_btn{
+        display:block;
+    }
+
+    .dropdown_menu{
+        display:block;
+    }
+}
