@@ -46,11 +46,47 @@ document
       )
       .then(
         () => {
-          alert("✅ Message sent!");
-          this.reset();
+          //hide form properly/dynamically
+          const form = document.getElementById("contact-form");
+          const wrapper = document.getElementById("contact-form-wrapper");
+          const title = document.getElementById("form-title");
+
+          const sectionHeight = wrapper.getBoundingClientRect().height;
+          wrapper.style.minHeight = sectionHeight + "px";
+          form.classList.add("fade-out");
+          title.classList.add("fade-out");
+
+          setTimeout(() => {
+            form.style.display = "none";
+            title.style.display = "none";
+            const messageDiv = document.getElementById("response-message");
+            messageDiv.className = "response-success fade-in";
+            messageDiv.innerHTML =
+              "Message sent successfully! <br> I’ll get back to you as soon as possible.";
+          }, 500); // match CSS transition duration
         },
         (err) => {
-          alert("❌ Send failed: " + err.text);
+          const messageDiv = document.getElementById("response-message");
+          messageDiv.className = "response-error";
+          messageDiv.innerHTML = "Send failed: Please try again.";
+
+          // Reset to hidden after animation finishes (4s)
+          setTimeout(() => {
+            messageDiv.className = "";
+            messageDiv.innerHTML = "";
+          }, 4000);
         }
       );
   });
+
+/* document.getElementById("test-button").addEventListener("click", () => {
+  const messageDiv = document.getElementById("response-message");
+  messageDiv.className = "response-error";
+  messageDiv.innerHTML = "Send failed: Please try again.";
+
+  // Reset to hidden after animation finishes (4s)
+  setTimeout(() => {
+    messageDiv.className = "";
+    messageDiv.innerHTML = "";
+  }, 4000);
+}); */

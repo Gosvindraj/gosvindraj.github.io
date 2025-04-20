@@ -43,37 +43,41 @@
     </header>
 
     <section id="contact" class="contact-section">
-      <h2>Feel free to drop a message</h2>
-      <form id="contact-form">
-        <label for="name" class="sr-only">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          placeholder="Your Name"
-          required
-        />
+      <div id="contact-form-wrapper">
+        <h2 id="form-title">Feel free to drop a message</h2>
 
-        <label for="email" class="sr-only">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Your Email"
-          required
-        />
+        <form id="contact-form">
+          <label for="name" class="sr-only">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Your Name"
+            required
+          />
 
-        <label for="message" class="sr-only">Message</label>
-        <textarea
-          id="message"
-          name="message"
-          rows="5"
-          placeholder="Your Message"
-          required
-        ></textarea>
+          <label for="email" class="sr-only">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Your Email"
+            required
+          />
 
-        <button type="submit" style="font-weight: bold">SUBMIT</button>
-      </form>
+          <label for="message" class="sr-only">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            placeholder="Your Message"
+            required
+          ></textarea>
+
+          <button type="submit" style="font-weight: bold">SUBMIT</button>
+        </form>
+        <div id="response-message"></div>
+      </div>
 
       <!-- Social Media Links -->
       <div class="social-links">
