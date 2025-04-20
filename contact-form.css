@@ -105,4 +105,74 @@
   .social-links h4 {
     display: none;
   }
+
+}
+
+
+/* Post form submission */
+#response-message {
+  display: none;
+  padding: 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  max-width: 600px;
+  font-size: 18px;
+  
+}
+
+/* Success */
+#response-message.response-success {
+  display: block;
+  background-color: #d4edda;
+  color: #0f5432;
+  border: 1px solid #c3e6cb;
+  
+  
+}
+
+/* Error */
+#response-message.response-error {
+  display: block;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  animation: fadeOut 4s forwards;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#contact-form-wrapper {
+  position: relative;
+}
+
+/* Fade out after 4s */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+
+/* Fade out */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Fade in */
+.fade-in {
+  opacity: 0;
+  display: block;
+  animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
