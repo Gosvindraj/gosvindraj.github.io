@@ -17,8 +17,40 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="navbar.css" />
-    <link rel="stylesheet" href="project.css" />
+    <link rel="stylesheet" href="crypto-api.css" />
     <link rel="icon" href="/favicon.ico" />
     <title>Gosvindraj | Project</title>
   </head>
+  <body>
+    <header>
+      <a href="index.html"><div id="logo">GOSVINDRAJ</div></a>
+      <nav>
+        <ul class="nav_links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="toggle_btn">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+      <div class="dropdown_menu">
+        <li><a href="about.html">About</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </div>
+    </header>
+    <div class="display">
+      <div class="convert_box">
+        <h3>USD/MYR Rate: <span id="rate_myr"></span></h3>
+        <h3>BTC Price in USD: <span id="btc_price"></span></h3>
+        <button class="convert_button">Fetch & Convert</button>
+        <h3>
+          <span id="btc_price_myr"></span>
+        </h3>
+      </div>
+    </div>
+    <script src="crypto-api.js"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
