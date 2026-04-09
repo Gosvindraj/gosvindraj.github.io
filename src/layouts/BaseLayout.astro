@@ -177,6 +177,45 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
         gsap.set(ring, { x: ringX, y: ringY });
       });
 
+      // click burst effect
+      document.addEventListener("mousedown", (e) => {
+        const x = e.clientX;
+        const y = e.clientY;
+
+        // ripple ring
+        const ripple = document.createElement("div");
+        ripple.className = "cursor-ripple";
+        document.body.appendChild(ripple);
+        gsap.set(ripple, { xPercent: -50, yPercent: -50, x, y, scale: 0.2, opacity: 0.9 });
+        gsap.to(ripple, {
+          scale: 2.8,
+          opacity: 0,
+          duration: 0.55,
+          ease: "power2.out",
+          onComplete: () => ripple.remove(),
+        });
+
+        // spark particles
+        const COUNT = 7;
+        for (let i = 0; i < COUNT; i++) {
+          const angle = (i / COUNT) * Math.PI * 2;
+          const dist  = 28 + Math.random() * 20;
+          const spark = document.createElement("div");
+          spark.className = "cursor-spark";
+          document.body.appendChild(spark);
+          gsap.set(spark, { xPercent: -50, yPercent: -50, x, y, scale: 1, opacity: 0.85 });
+          gsap.to(spark, {
+            x: x + Math.cos(angle) * dist,
+            y: y + Math.sin(angle) * dist,
+            scale: 0,
+            opacity: 0,
+            duration: 0.42 + Math.random() * 0.15,
+            ease: "power3.out",
+            onComplete: () => spark.remove(),
+          });
+        }
+      });
+
       // rebind hover/text states after each navigation
       function bindCursorStates() {
         document.querySelectorAll("a, button, input, textarea, [data-cursor]").forEach((el) => {

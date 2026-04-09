@@ -202,6 +202,39 @@ body.cursor-text #cursor-ring {
   will-change: transform, opacity;
 }
 
+/* click ripple ring */
+.cursor-ripple {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid rgba(155, 109, 206, 0.75);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9996;
+  will-change: transform, opacity;
+}
+
+/* click spark particles */
+.cursor-spark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9996;
+  will-change: transform, opacity;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-ripple,
+  .cursor-spark { display: none !important; }
+}
+
 /* ── Navbar ────────────────────────────────────── */
 header {
   position: fixed;
