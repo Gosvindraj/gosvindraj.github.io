@@ -1,0 +1,871 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Gosvindraj" description="Personal site of Gosvindraj.">
+  <section id="hero">
+    <canvas id="matrix-canvas"></canvas>
+    <div class="hero-vignette"></div>
+
+    <!-- Phase 1: found-me screen -->
+    <div id="found-me-screen">
+      <h1 class="hero-name" id="hero-name">ah, you found me.</h1>
+      <p class="found-me-sub" id="found-me-sub">didn't exactly leave a trail of breadcrumbs.</p>
+      <p class="found-me-note" id="found-me-note">you're either very curious or very lost —<br><span>either way, consider yourself let in.</span></p>
+      <button class="found-me-btn" id="found-me-btn">
+        <span>okay, fine. enter.</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Phase 2: intro reveal -->
+    <div id="home-intro">
+      <h2 class="intro-heading" id="intro-heading">
+        <span class="char-wrap"><span class="char-line">hi, i'm</span></span>
+        <span class="char-wrap accent-line"><span class="char-line">gosh.</span></span>
+      </h2>
+      <div class="intro-bio" id="intro-bio">
+        <p>just me using AI to build random things —<br>i get bored fast and move on to the next idea.</p>
+        <p class="intro-bio-accent">it's a feature, not a bug.</p>
+      </div>
+      <div class="intro-facts" id="intro-facts">
+        <div class="fact-card">
+          <span class="fact-label">based in</span>
+          <span class="fact-value">Malaysia</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-label">currently</span>
+          <span class="fact-value">studying + building</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-label">powered by</span>
+          <span class="fact-value">caffeine &amp; curiosity</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-label">status</span>
+          <span class="fact-value">
+            <span class="dot-live"></span>open to collabs
+          </span>
+        </div>
+      </div>
+      <div class="intro-cta" id="intro-cta">
+        <a href="/projects" class="btn-ghost">See what I built</a>
+        <a href="/about"    class="btn-ghost">Learn about me</a>
+      </div>
+    </div>
+
+  </section>
+</BaseLayout>
+
+<style>
+  #hero {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 8%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── Matrix canvas ──────────────────────────── */
+  #matrix-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hero-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse 55% 65% at 50% 50%,
+      rgba(11, 11, 13, 0.92) 0%,
+      rgba(11, 11, 13, 0.60) 45%,
+      rgba(11, 11, 13, 0.10) 75%,
+      transparent 100%
+    );
+  }
+
+  /* ── Phase 1: found-me ──────────────────────── */
+  #found-me-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 8%;
+  }
+
+  /* CRT scanlines overlay */
+  #found-me-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.06) 3px,
+      rgba(0, 0, 0, 0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+    animation: scanlines-scroll 6s linear infinite;
+  }
+
+  @keyframes scanlines-scroll {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 80px; }
+  }
+
+  .hero-name {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    line-height: 1;
+    opacity: 0;
+    margin-bottom: 1.2rem;
+    cursor: default;
+  }
+
+  .found-me-sub {
+    font-size: clamp(0.78rem, 1.3vw, 0.88rem);
+    font-weight: 400;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    opacity: 0;
+    margin-bottom: 0.55rem;
+  }
+
+  .found-me-note {
+    font-size: clamp(0.78rem, 1.3vw, 0.88rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    line-height: 1.85;
+    opacity: 0;
+    margin-bottom: 2.4rem;
+  }
+
+  .found-me-note span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .char {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+
+  .char-inner {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  .found-me-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.4rem;
+    border-radius: 2px;
+    cursor: none;
+    opacity: 0;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .found-me-btn i {
+    font-size: 10px;
+    animation: bob-right 1.8s ease-in-out infinite;
+  }
+
+  @keyframes bob-right {
+    0%, 100% { transform: translateX(0); }
+    50%       { transform: translateX(4px); }
+  }
+
+  .found-me-btn:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  /* ── Phase 2: intro ─────────────────────────── */
+  #home-intro {
+    position: relative;
+    z-index: 3;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .intro-heading {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(3rem, 7vw, 6rem);
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.05;
+    letter-spacing: 0.03em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.05em;
+    margin-bottom: 2rem;
+  }
+
+  .char-wrap {
+    display: block;
+    overflow: hidden;
+  }
+
+  .char-line {
+    display: block;
+    transform: translateY(110%);
+  }
+
+  .accent-line .char-line { color: var(--accent); }
+
+  .intro-bio {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    opacity: 0;
+  }
+
+  .intro-bio p {
+    font-size: clamp(0.82rem, 1.5vw, 0.95rem);
+    font-weight: 400;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+
+  .intro-bio-accent {
+    color: var(--accent) !important;
+    font-style: italic;
+  }
+
+  .intro-facts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    width: 100%;
+    margin-bottom: 2rem;
+    opacity: 0;
+  }
+
+  .fact-card {
+    background: var(--bg);
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    border-right: 1px solid var(--border);
+    transition: background var(--transition);
+    text-align: center;
+  }
+
+  .fact-card:last-child { border-right: none; }
+  .fact-card:hover { background: var(--surface); }
+
+  .fact-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .fact-value {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .dot-live {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    flex-shrink: 0;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+    50%       { box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
+  }
+
+  .intro-cta {
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+  }
+
+  .btn-ghost {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.65rem 1.5rem;
+    border-radius: 2px;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    cursor: none;
+  }
+
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  @media (max-width: 700px) {
+    .intro-facts  { grid-template-columns: 1fr 1fr; }
+    .fact-card    { border-right: none; border-bottom: 1px solid var(--border); }
+    .fact-card:last-child { border-bottom: none; }
+    .intro-cta    { flex-direction: column; align-items: center; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  /* ════════════════════════════════════════════
+     MATRIX BACKGROUND
+  ════════════════════════════════════════════ */
+
+  const POOL =
+    "0123456789ABCDEF0123456789ABCDEFabcdef01" +
+    "ΞΩΣ∇αβσ₿∑πΔλΨ";
+
+  const WORDS = [
+    "AI", "BTC", "ETH", "0x", "hash",
+    "node", "block", "chain", "model",
+    "token", "neural", "fork", "key",
+  ];
+
+  interface Column {
+    x: number; y: number; speed: number; opacity: number;
+    glitching: boolean; glitchCooldown: number;
+    wordQueue: string; wordIdx: number;
+  }
+
+  let rafId = 0;
+
+  function initMatrix() {
+    const canvas = document.getElementById("matrix-canvas") as HTMLCanvasElement | null;
+    const hero   = document.getElementById("hero");
+    if (!canvas || !hero) return;
+
+    const ctx = canvas.getContext("2d")!;
+    const FONT = 13;
+    const FONT_FAMILY = "'Courier New', monospace";
+
+    function resize() {
+      canvas.width  = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+    }
+    resize();
+
+    const buildColumns = (): Column[] => {
+      const count = Math.floor(canvas.width / FONT);
+      return Array.from({ length: count }, (_, i) => ({
+        x: i * FONT,
+        y: Math.random() * -(canvas.height / FONT) * 1.5,
+        speed: 0.18 + Math.random() * 0.42,
+        opacity: 0.03 + Math.random() * 0.12,
+        glitching: false, glitchCooldown: 0,
+        wordQueue: "", wordIdx: 0,
+      }));
+    };
+
+    let cols = buildColumns();
+
+    function draw() {
+      ctx.fillStyle = "rgba(11, 11, 13, 0.06)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = `${FONT}px ${FONT_FAMILY}`;
+
+      for (const col of cols) {
+        if (col.glitchCooldown > 0) {
+          col.glitchCooldown--;
+        } else if (Math.random() < 0.0008) {
+          col.glitching = true;
+          col.glitchCooldown = 4 + Math.floor(Math.random() * 10);
+          if (Math.random() < 0.4) {
+            col.wordQueue = WORDS[Math.floor(Math.random() * WORDS.length)];
+            col.wordIdx   = 0;
+          }
+        } else {
+          col.glitching = false;
+        }
+
+        let char: string;
+        if (col.wordQueue && col.wordIdx < col.wordQueue.length) {
+          char = col.wordQueue[col.wordIdx++];
+        } else {
+          col.wordQueue = "";
+          char = POOL[Math.floor(Math.random() * POOL.length)];
+        }
+
+        const py = col.y * FONT;
+
+        if (col.glitching) {
+          const flicker = 0.5 + Math.random() * 0.45;
+          ctx.fillStyle = `rgba(230, 120, 255, ${flicker})`;
+          const xOff = (Math.random() < 0.4) ? (Math.random() - 0.5) * 6 : 0;
+          ctx.fillText(char, col.x + xOff, py);
+          ctx.fillStyle = `rgba(255, 60, 130, 0.25)`;
+          ctx.fillText(char, col.x + 2, py);
+          ctx.fillStyle = `rgba(100, 200, 255, 0.2)`;
+          ctx.fillText(char, col.x - 2, py);
+        } else {
+          ctx.fillStyle = `rgba(175, 130, 220, ${Math.min(col.opacity + 0.04, 0.55)})`;
+          ctx.fillText(char, col.x, py);
+        }
+
+        col.y += col.speed;
+        if (col.y * FONT > canvas.height + FONT * 10) {
+          col.y = Math.random() * -(canvas.height / FONT) * 0.8;
+          col.opacity = 0.03 + Math.random() * 0.12;
+        }
+      }
+
+      rafId = requestAnimationFrame(draw);
+    }
+
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(draw);
+
+    const onResize = () => { resize(); cols = buildColumns(); };
+    window.addEventListener("resize", onResize);
+    document.addEventListener("astro:before-swap", () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", onResize);
+    }, { once: true });
+  }
+
+  /* ════════════════════════════════════════════
+     PHASE 2: show intro (with or without anim)
+  ════════════════════════════════════════════ */
+
+  /* ── Glitch helpers ──────────────────────────── */
+  const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#@$%&";
+
+  function glitchReveal(el: HTMLElement, finalText: string, duration = 780) {
+    const frames = 18;
+    const ms = Math.round(duration / frames);
+    let frame = 0;
+    el.style.opacity = "1";
+    el.style.transform = "translateY(0%)";
+
+    const iv = setInterval(() => {
+      const progress = frame / frames;
+      const revealed = Math.floor(progress * finalText.length);
+
+      let display = "";
+      for (let i = 0; i < finalText.length; i++) {
+        if (i < revealed) {
+          display += Math.random() < 0.07 * (1 - progress)
+            ? GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]
+            : finalText[i];
+        } else {
+          display += finalText[i] === " " ? "\u00a0"
+            : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        }
+      }
+      el.textContent = display;
+
+      if (frame < frames - 2 && Math.random() < 0.4) {
+        el.style.textShadow = `${+(Math.random()*4-2).toFixed(1)}px 0 rgba(255,0,200,0.6),`
+                            + `${+(Math.random()*-4+2).toFixed(1)}px 0 rgba(0,255,255,0.6)`;
+      } else {
+        el.style.textShadow = "";
+      }
+
+      frame++;
+      if (frame > frames) {
+        clearInterval(iv);
+        el.textContent      = finalText;
+        el.style.textShadow = "";
+      }
+    }, ms);
+  }
+
+  // Permanent idle glitch: char corruption + vibrate bursts + colour pulsing
+  function startIdleGlitch(els: HTMLElement[], texts: string[], heading?: HTMLElement) {
+
+    /* ── 1. Char corruption tick (every ~2s) ── */
+    const corruptIv = setInterval(() => {
+      els.forEach((el, idx) => {
+        const text = texts[idx];
+        if (Math.random() > 0.35) return;
+
+        const chars = text.split("");
+        const numCorrupt = Math.random() < 0.5 ? 1 : 2;
+        for (let n = 0; n < numCorrupt; n++) {
+          const pos = Math.floor(Math.random() * chars.length);
+          if (chars[pos] !== " ")
+            chars[pos] = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        }
+        el.textContent = chars.join("");
+
+        if (Math.random() < 0.55) {
+          el.style.textShadow =
+            `${+(Math.random()*3-1.5).toFixed(1)}px 0 rgba(255,0,200,0.55),`
+          + `${+(Math.random()*-3+1.5).toFixed(1)}px 0 rgba(0,255,255,0.55)`;
+        }
+
+        setTimeout(() => {
+          el.textContent      = text;
+          el.style.textShadow = "";
+        }, 55 + Math.random() * 90);
+      });
+    }, 1800 + Math.random() * 600);
+
+    if (!heading) return () => clearInterval(corruptIv);
+
+    /* ── 2. Vibrate burst (rapid micro-jitter on the heading) ── */
+    function vibrateBurst() {
+      const steps = 7;
+      const tl = gsap.timeline({
+        onComplete: () => gsap.set(heading, { x: 0, y: 0 }),
+      });
+      for (let i = 0; i < steps; i++) {
+        tl.to(heading, {
+          x: (Math.random() - 0.5) * 5,
+          y: (Math.random() - 0.5) * 2.5,
+          duration: 0.045,
+          ease: "none",
+        });
+      }
+    }
+
+    /* ── 3. Colour pulse (accent glow that breathes on the lines) ── */
+    // Slight hue shifts: base purple, magenta-lean, cyan-lean
+    const pulseColours = [
+      "0 0 10px rgba(155,109,206,0.55), 0 0 22px rgba(155,109,206,0.25)",
+      "0 0 10px rgba(200, 80,220,0.55), 0 0 22px rgba(200, 80,220,0.25)",
+      "0 0 10px rgba( 80,180,220,0.45), 0 0 22px rgba( 80,180,220,0.20)",
+    ];
+
+    function colourPulse() {
+      const glow = pulseColours[Math.floor(Math.random() * pulseColours.length)];
+      els.forEach(el => {
+        gsap.to(el, {
+          textShadow: glow,
+          duration: 0.25,
+          ease: "power2.out",
+          onComplete: () =>
+            gsap.to(el, { textShadow: "none", duration: 0.6 + Math.random() * 0.4, ease: "power2.in" }),
+        });
+      });
+    }
+
+    /* ── 4. Combined event scheduler ── */
+    const effectIv = setInterval(() => {
+      const r = Math.random();
+      if (r < 0.45)       vibrateBurst();
+      else if (r < 0.80)  colourPulse();
+      else { vibrateBurst(); setTimeout(colourPulse, 120); } // both together
+    }, 2000 + Math.random() * 1000);
+
+    return () => { clearInterval(corruptIv); clearInterval(effectIv); };
+  }
+
+  function showIntro(animate: boolean) {
+    const screen = document.getElementById("home-intro") as HTMLElement;
+    if (!screen) return;
+    screen.style.display = "flex";
+
+    const heading   = screen.querySelector<HTMLElement>("#intro-heading") ?? undefined;
+    const lines     = Array.from(screen.querySelectorAll<HTMLElement>(".char-line"));
+    const lineTexts = lines.map(el => el.textContent ?? "");
+    const bio   = screen.querySelector<HTMLElement>("#intro-bio");
+    const facts = screen.querySelector<HTMLElement>("#intro-facts");
+    const cta   = screen.querySelector<HTMLElement>("#intro-cta");
+
+    if (!animate) {
+      lines.forEach(l => {
+        l.style.transform = "translateY(0%)";
+        l.style.opacity   = "1";
+      });
+      if (bio)   bio.style.opacity   = "1";
+      if (facts) facts.style.opacity = "1";
+      if (cta)   cta.style.opacity   = "1";
+      startIdleGlitch(lines, lineTexts, heading);
+      return;
+    }
+
+    // Glitch each line in with a stagger, then start idle loop after both settle
+    lines.forEach((el, i) => {
+      setTimeout(() => {
+        glitchReveal(el, lineTexts[i], 780);
+        if (i === lines.length - 1) {
+          setTimeout(() => startIdleGlitch(lines, lineTexts, heading), 800);
+        }
+      }, i * 220);
+    });
+
+    // Rest of intro fades in after headings
+    gsap.timeline({ delay: 0.6 })
+      .fromTo(bio,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }
+      )
+      .fromTo(facts,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        "-=0.25"
+      )
+      .fromTo(".fact-card",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.07, ease: "back.out(1.5)" },
+        "-=0.3"
+      )
+      .fromTo(cta,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.45, ease: "back.out(2)" },
+        "-=0.2"
+      );
+  }
+
+  /* ════════════════════════════════════════════
+     SESSION STATE — in-memory only (resets on reload, survives SPA nav)
+  ════════════════════════════════════════════ */
+  let foundMeSeen = false;
+
+  /* ════════════════════════════════════════════
+     PHASE 1: found-me screen
+  ════════════════════════════════════════════ */
+
+  function initFoundMe() {
+    const heroName = document.getElementById("hero-name") as HTMLElement;
+    const btn      = document.getElementById("found-me-btn") as HTMLElement;
+    if (!heroName || !btn) return;
+
+    /* ── Character split ─────────────────────── */
+    const rawText = heroName.textContent ?? "";
+    heroName.innerHTML = rawText
+      .split("")
+      .map(c => `<span class="char"><span class="char-inner">${c === " " ? "&nbsp;" : c}</span></span>`)
+      .join("");
+    heroName.style.opacity = "1";
+
+    const charInners = Array.from(heroName.querySelectorAll<HTMLElement>(".char-inner"));
+
+    /* ── Glitch idle loop ────────────────────── */
+    let stopGlitch: (() => void) | null = null;
+
+    function startFoundMeGlitch() {
+      const corruptIv = setInterval(() => {
+        if (Math.random() > 0.45) return;
+        const eligible = charInners.filter(el => {
+          const t = el.textContent ?? "";
+          return t.trim() !== "" && t !== "\u00a0";
+        });
+        if (!eligible.length) return;
+        const el = eligible[Math.floor(Math.random() * eligible.length)];
+        const orig = el.textContent ?? "";
+        el.textContent = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        setTimeout(() => { el.textContent = orig; }, 55 + Math.random() * 95);
+      }, 1800);
+
+      function jitter() {
+        const tl = gsap.timeline({ onComplete: () => gsap.set(heroName, { x: 0, y: 0 }) });
+        for (let i = 0; i < 9; i++) {
+          tl.to(heroName, {
+            x: (Math.random() - 0.5) * 12,
+            y: (Math.random() - 0.5) * 5,
+            duration: 0.04,
+            ease: "none",
+          });
+        }
+      }
+
+      function chromaFlash() {
+        const ox = +(Math.random() * 10 - 5).toFixed(1);
+        const oy = +(Math.random() * 4 - 2).toFixed(1);
+        gsap.to(heroName, {
+          filter: `drop-shadow(${ox}px ${oy}px 0 rgba(255,0,150,0.7)) drop-shadow(${-ox}px ${-oy}px 0 rgba(0,255,220,0.6))`,
+          duration: 0.07, ease: "none",
+          onComplete: () => gsap.to(heroName, { filter: "none", duration: 0.5 + Math.random() * 0.3 }),
+        });
+      }
+
+      const scr = document.getElementById("found-me-screen");
+      function screenFlicker() {
+        if (!scr) return;
+        gsap.timeline()
+          .to(scr, { opacity: 0.6,  duration: 0.04, ease: "none" })
+          .to(scr, { opacity: 1,    duration: 0.04, ease: "none" })
+          .to(scr, { opacity: 0.82, duration: 0.06, ease: "none" })
+          .to(scr, { opacity: 1,    duration: 0.05, ease: "none" });
+      }
+
+      const effectIv = setInterval(() => {
+        const r = Math.random();
+        if      (r < 0.30) jitter();
+        else if (r < 0.60) chromaFlash();
+        else if (r < 0.78) { jitter(); setTimeout(chromaFlash, 90); }
+        else               screenFlicker();
+      }, 2000 + Math.random() * 2000);
+
+      return () => { clearInterval(corruptIv); clearInterval(effectIv); };
+    }
+
+    /* ── Entrance ────────────────────────────── */
+    const preloaderDelay = sessionStorage.getItem("intro-seen") ? 0 : 2.2;
+    gsap.timeline({ delay: preloaderDelay })
+      .fromTo(charInners,
+        { y: "110%" },
+        { y: "0%", stagger: 0.035, duration: 0.65, ease: "power4.out" }
+      )
+      .fromTo("#found-me-sub",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        "-=0.1"
+      )
+      .fromTo("#found-me-note",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        "-=0.25"
+      )
+      .fromTo(btn,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.45, ease: "back.out(2)" },
+        "-=0.2"
+      )
+      .call(() => { stopGlitch = startFoundMeGlitch(); });
+
+    /* ── Idle drift ──────────────────────────── */
+    let driftAnimating = false;
+    let driftInterval: ReturnType<typeof setInterval>;
+
+    function idleDrift() {
+      if (driftAnimating) return;
+      driftAnimating = true;
+      gsap.timeline({ onComplete: () => { driftAnimating = false; } })
+        .to(charInners, { x: () => gsap.utils.random(-5, 5), y: () => gsap.utils.random(-4, 4), duration: 3, stagger: 0.05, ease: "sine.inOut" })
+        .to(charInners, { x: 0, y: 0, duration: 1.2, stagger: 0.03, ease: "elastic.out(1, 0.5)" });
+    }
+
+    const driftStart = setTimeout(() => {
+      idleDrift();
+      driftInterval = setInterval(idleDrift, 12000);
+    }, (preloaderDelay + 3.5) * 1000);
+
+    /* ── Proximity wave ──────────────────────── */
+    const quickY     = charInners.map(el => gsap.quickTo(el, "y",     { duration: 0.45, ease: "power3.out" }));
+    const quickScale = charInners.map(el => gsap.quickTo(el, "scale", { duration: 0.45, ease: "power3.out" }));
+    const WAVE_RADIUS = 160, WAVE_LIFT = -28, WAVE_SCALE = 1.12;
+
+    function onMove(e: MouseEvent) {
+      if (driftAnimating) return;
+      charInners.forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        const dist = Math.abs(e.clientX - (rect.left + rect.width / 2));
+        const t    = Math.max(0, 1 - dist / WAVE_RADIUS);
+        const s    = t * t * (3 - 2 * t);
+        quickY[i](WAVE_LIFT * s);
+        quickScale[i](1 + (WAVE_SCALE - 1) * s);
+      });
+    }
+
+    function onLeave() {
+      if (driftAnimating) return;
+      charInners.forEach((_, i) => { quickY[i](0); quickScale[i](1); });
+    }
+
+    heroName.addEventListener("mousemove",  onMove);
+    heroName.addEventListener("mouseleave", onLeave);
+
+    /* ── Click → transition ──────────────────── */
+    btn.addEventListener("click", () => {
+      foundMeSeen = true;
+      if (stopGlitch) stopGlitch();
+      clearTimeout(driftStart);
+      clearInterval(driftInterval);
+      heroName.removeEventListener("mousemove",  onMove);
+      heroName.removeEventListener("mouseleave", onLeave);
+
+      const screen = document.getElementById("found-me-screen")!;
+
+      gsap.timeline({
+        onComplete: () => {
+          screen.style.display = "none";
+          showIntro(true);
+        },
+      })
+        // chars scatter outward
+        .to(charInners, {
+          y:       () => gsap.utils.random(-120, -220),
+          x:       () => gsap.utils.random(-100, 100),
+          rotate:  () => gsap.utils.random(-25, 25),
+          opacity: 0,
+          duration: 0.55,
+          stagger:  { amount: 0.18, from: "center" },
+          ease:    "power3.in",
+        })
+        // sub text + button fade out with chars
+        .to(["#found-me-sub", "#found-me-note", btn], {
+          opacity: 0, y: -8, duration: 0.3, ease: "power2.in",
+        }, "<+0.05");
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     ENTRY POINT
+  ════════════════════════════════════════════ */
+
+  function initHero() {
+    // Matrix runs regardless
+    initMatrix();
+
+    if (foundMeSeen) {
+      // Returning within session — skip phase 1
+      const foundMeScreen = document.getElementById("found-me-screen");
+      if (foundMeScreen) foundMeScreen.style.display = "none";
+      showIntro(false);
+    } else {
+      // Fresh session — show phase 1
+      initFoundMe();
+    }
+  }
+
+  document.addEventListener("astro:page-load", initHero);
+</script>

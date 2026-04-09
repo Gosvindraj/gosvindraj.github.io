@@ -1,0 +1,412 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Gruppo&family=Montserrat:wght@300;400;500;600&display=swap');
+
+/* ── Design Tokens ─────────────────────────────── */
+:root {
+  --bg:           #0b0b0d;
+  --surface:      #111116;
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(155, 109, 206, 0.5);
+  --text:         #e4e4e8;
+  --muted:        #55556a;
+  --accent:       #9b6dce;
+  --accent-dim:   rgba(155, 109, 206, 0.12);
+  --transition:   0.3s ease;
+  --nav-height:   72px;
+}
+
+/* ── Reset ─────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* Film grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 500;
+}
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: transparent; }
+
+/* ── Preloader ─────────────────────────────────── */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+#preloader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+#preloader-bar-wrap {
+  width: 160px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+#preloader-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  will-change: width;
+}
+
+#preloader-count {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  will-change: opacity;
+}
+
+/* ── Ambient orbs ──────────────────────────────── */
+#ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.orb-1 {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(circle, rgba(155, 109, 206, 0.55) 0%, transparent 70%);
+  opacity: 0.07;
+  top: -200px;
+  left: -150px;
+}
+
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(90, 60, 200, 0.6) 0%, transparent 70%);
+  opacity: 0.06;
+  bottom: -100px;
+  right: -100px;
+}
+
+.orb-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(140, 95, 190, 0.5) 0%, transparent 70%);
+  opacity: 0.05;
+  top: 45%;
+  left: 45%;
+}
+
+/* ── Custom Cursor ─────────────────────────────── */
+#cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+
+#cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(155, 109, 206, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  will-change: transform, width, height, border-radius;
+  transition: width 0.2s ease, height 0.2s ease, border-radius 0.2s ease, border-color 0.2s ease;
+}
+
+/* hover state */
+body.cursor-hover #cursor-dot {
+  width: 10px;
+  height: 10px;
+}
+
+body.cursor-hover #cursor-ring {
+  width: 44px;
+  height: 44px;
+  border-color: rgba(155, 109, 206, 0.65);
+}
+
+/* text I-beam morph */
+body.cursor-text #cursor-ring {
+  width: 2px;
+  height: 20px;
+  border-radius: 1px;
+  border-color: rgba(155, 109, 206, 0.8);
+}
+
+/* speed trail ghost */
+.cursor-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.45;
+  will-change: transform, opacity;
+}
+
+/* ── Navbar ────────────────────────────────────── */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8%;
+  background: rgba(11, 11, 13, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+#logo {
+  font-family: "Gruppo", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  cursor: none;
+  transition: color var(--transition);
+}
+
+#logo:hover { color: var(--accent); }
+
+.nav_links {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+}
+
+/* nav roll wrapper */
+.nav-roll {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.1em;
+  vertical-align: bottom;
+}
+
+.nav-roll-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-roll-text {
+  display: block;
+  line-height: 1.1em;
+}
+
+.nav_links a {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: none;
+  position: relative;
+  display: inline-block;
+}
+
+.nav_links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width var(--transition);
+}
+
+.nav_links a:hover,
+.nav_links a.active { color: var(--text); }
+
+.nav_links a:hover::after,
+.nav_links a.active::after { width: 100%; }
+
+/* ── Mobile Nav ────────────────────────────────── */
+.toggle_btn {
+  color: var(--muted);
+  font-size: 1.25rem;
+  cursor: none;
+  display: none;
+  transition: color var(--transition);
+}
+
+.toggle_btn:hover { color: var(--text); }
+
+.dropdown_menu {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  right: 0;
+  left: 0;
+  list-style: none;
+  background: rgba(11, 11, 13, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown_menu.open  { max-height: 200px; }
+
+.dropdown_menu li {
+  padding: 1rem 8%;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdown_menu li:last-child { border-bottom: none; }
+
+.dropdown_menu a {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color var(--transition);
+}
+
+.dropdown_menu a:hover { color: var(--text); }
+
+@media (max-width: 700px) {
+  .nav_links     { display: none; }
+  .toggle_btn    { display: block; }
+  .dropdown_menu { display: block; }
+}
+
+/* ── Page wrapper ──────────────────────────────── */
+main {
+  padding-top: var(--nav-height);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ── Footer ────────────────────────────────────── */
+#site-footer {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 8%;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.footer-name {
+  font-family: "Gruppo", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.footer-copy {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.footer-sep {
+  font-size: 11px;
+  color: var(--border-hover);
+  opacity: 0.5;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.footer-socials a {
+  color: var(--muted);
+  font-size: 13px;
+  cursor: none;
+  transition: color var(--transition);
+}
+
+.footer-socials a:hover { color: var(--text); }
+
+@media (max-width: 700px) {
+  #site-footer { display: none; }
+}
+
+/* ── Utility ───────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
