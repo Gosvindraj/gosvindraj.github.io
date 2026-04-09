@@ -143,6 +143,10 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
       let ringX  = 0, ringY  = 0;
       let prevX  = 0, prevY  = 0;
 
+      // text-rect cache: only recompute when hovered element changes
+      let lastTextEl: Element | null = null;
+      let textRects: DOMRect[] = [];
+
       // center via xPercent/yPercent once
       gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
 
@@ -168,6 +172,25 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
         }
         prevX = mouseX;
         prevY = mouseY;
+
+        // precise text cursor: only active when over actual rendered glyphs
+        const hit = document.elementFromPoint(mouseX, mouseY);
+        const textEl = hit?.closest("p, h1, h2, h3, h4, h5, h6, li, span") ?? null;
+        if (textEl !== lastTextEl) {
+          lastTextEl = textEl;
+          if (textEl) {
+            const r = document.createRange();
+            r.selectNodeContents(textEl);
+            textRects = Array.from(r.getClientRects());
+          } else {
+            textRects = [];
+          }
+        }
+        const overGlyph = textRects.some(r =>
+          mouseX >= r.left && mouseX <= r.right &&
+          mouseY >= r.top  && mouseY <= r.bottom
+        );
+        document.body.classList.toggle("cursor-text", overGlyph);
       });
 
       // ring follows with GSAP ticker lerp (smoother than RAF)
@@ -222,10 +245,11 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
           el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
           el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
         });
-        document.querySelectorAll("p, h1, h2, h3, h4, li").forEach((el) => {
+        document.querySelectorAll("input, textarea").forEach((el) => {
           el.addEventListener("mouseenter", () => document.body.classList.add("cursor-text"));
           el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-text"));
         });
+
       }
 
       bindCursorStates();
