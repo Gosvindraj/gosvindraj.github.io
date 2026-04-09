@@ -363,13 +363,14 @@ header {
 .dropdown_menu.open  { max-height: 200px; }
 
 .dropdown_menu li {
-  padding: 1rem 8%;
   border-bottom: 1px solid var(--border);
 }
 
 .dropdown_menu li:last-child { border-bottom: none; }
 
 .dropdown_menu a {
+  display: block;
+  padding: 1rem 8%;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.1em;
