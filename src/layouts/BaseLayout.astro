@@ -200,8 +200,21 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
         gsap.set(ring, { x: ringX, y: ringY });
       });
 
-      // click burst effect
+      // prevent browser drag ghost on all elements
+      document.addEventListener("dragstart", (e) => e.preventDefault());
+
+      // ── Click burst + hold-drag streak ──────────────
+      let isDown    = false;
+      let hasDragged = false;
+      let lastStreakX = 0, lastStreakY = 0;
+      const STREAK_GAP = 10; // px between streak particles
+
       document.addEventListener("mousedown", (e) => {
+        isDown     = true;
+        hasDragged = false;
+        lastStreakX = e.clientX;
+        lastStreakY = e.clientY;
+
         const x = e.clientX;
         const y = e.clientY;
 
@@ -238,6 +251,43 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
           });
         }
       });
+
+      // drag streak: emit on mousemove while button held
+      document.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        const dx = e.clientX - lastStreakX;
+        const dy = e.clientY - lastStreakY;
+        const dist = Math.hypot(dx, dy);
+        if (dist < STREAK_GAP) return;
+
+        hasDragged = true;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        const length = 14 + Math.min(dist * 1.2, 32);
+
+        const streak = document.createElement("div");
+        streak.className = "cursor-streak";
+        document.body.appendChild(streak);
+        gsap.set(streak, {
+          xPercent: -50, yPercent: -50,
+          x: e.clientX, y: e.clientY,
+          width: length,
+          rotation: angle,
+          opacity: 0.55 + Math.random() * 0.3,
+          scaleX: 1,
+        });
+        gsap.to(streak, {
+          opacity: 0,
+          scaleX: 0.1,
+          duration: 0.45 + Math.random() * 0.15,
+          ease: "power2.out",
+          onComplete: () => streak.remove(),
+        });
+
+        lastStreakX = e.clientX;
+        lastStreakY = e.clientY;
+      });
+
+      document.addEventListener("mouseup", () => { isDown = false; });
 
       // rebind hover/text states after each navigation
       function bindCursorStates() {

@@ -216,6 +216,21 @@ body.cursor-text #cursor-ring {
   will-change: transform, opacity;
 }
 
+/* hold-drag streak */
+.cursor-streak {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 18px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 9996;
+  transform-origin: right center;
+  will-change: transform, opacity;
+}
+
 /* click spark particles */
 .cursor-spark {
   position: fixed;
@@ -232,7 +247,8 @@ body.cursor-text #cursor-ring {
 
 @media (hover: none), (pointer: coarse) {
   .cursor-ripple,
-  .cursor-spark { display: none !important; }
+  .cursor-spark,
+  .cursor-streak { display: none !important; }
 }
 
 /* ── Navbar ────────────────────────────────────── */
