@@ -1,0 +1,443 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const projects = [
+  {
+    index: "01",
+    title: "2D Snake Game",
+    summary: "A basic 2D snake game made with o4 mini high.",
+    detail: 'Just click "View Live" and try it yourself.',
+    live: "/snake-game",
+    source: "#",
+  },
+  {
+    index: "02",
+    title: "BTC Price in MYR",
+    summary: "Figure out the current price of BTC in MYR.",
+    detail: "Fetch API of exchange rate and BTC/USD pair, then convert.",
+    live: "/crypto-api",
+    source: "#",
+  },
+  {
+    index: "03",
+    title: "Project Three",
+    summary: "Nothing here yet — stay tuned.",
+    detail: "Details coming soon.",
+    live: "#",
+    source: "#",
+  },
+  {
+    index: "04",
+    title: "Project Four",
+    summary: "Nothing here yet — stay tuned.",
+    detail: "Details coming soon.",
+    live: "#",
+    source: "#",
+  },
+  {
+    index: "05",
+    title: "Project Five",
+    summary: "Nothing here yet — stay tuned.",
+    detail: "Details coming soon.",
+    live: "#",
+    source: "#",
+  },
+  {
+    index: "06",
+    title: "Project Six",
+    summary: "Nothing here yet — stay tuned.",
+    detail: "Details coming soon.",
+    live: "#",
+    source: "#",
+  },
+];
+---
+<BaseLayout title="Gosvindraj | Projects">
+  <section id="projects">
+    <div class="projects-header">
+      <p class="section-label" id="projects-label">Work</p>
+      <h2 class="section-title" id="projects-title">Fun projects.</h2>
+    </div>
+
+    <div class="project-grid" id="project-grid">
+      {projects.map((p) => (
+        <div class="project-card" role="button" tabindex="0" aria-expanded="false">
+          <span class="card-sheen"></span>
+          <span class="card-index">{p.index}</span>
+          <h3 class="card-title">{p.title}</h3>
+          <p class="card-summary">{p.summary}</p>
+          <div class="card-details">
+            <p class="card-detail-text">{p.detail}</p>
+            <div class="card-links">
+              <a href={p.live} class="card-link">View Live <span>↗</span></a>
+              <a href={p.source} class="card-link">Source <span>↗</span></a>
+            </div>
+          </div>
+          <div class="card-indicator" aria-hidden="true">
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #projects {
+    min-height: calc(100vh - var(--nav-height));
+    padding: 4rem 8% 6rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .projects-header {
+    margin-bottom: 3rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    opacity: 0;
+  }
+
+  .section-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    opacity: 0;
+  }
+
+  /* grid */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+    perspective: 1000px;
+  }
+
+  .project-card {
+    background: var(--bg);
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition);
+    opacity: 0; /* GSAP controls */
+    will-change: transform;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid transparent;
+    transition: border-color var(--transition);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .project-card:hover { background: var(--surface); }
+  .project-card:hover::before { border-color: var(--border-hover); }
+
+  /* sheen highlight (moved by JS) */
+  .card-sheen {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(155,109,206,0.07) 0%, transparent 60%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+
+  .project-card:hover .card-sheen { opacity: 1; }
+
+  .card-index {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-family: 'Courier New', monospace;
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-summary {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.35s ease;
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .project-card.active .card-details {
+    max-height: 120px;
+    opacity: 1;
+  }
+
+  .card-detail-text {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-links {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .card-link {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color var(--transition);
+    cursor: none;
+  }
+
+  .card-link span {
+    display: inline-block;
+    transition: transform var(--transition);
+  }
+
+  .card-link:hover { color: var(--accent); }
+  .card-link:hover span { transform: translate(2px, -2px); }
+
+  /* clickable card */
+  .project-card { cursor: none; }
+
+  .card-indicator {
+    position: absolute;
+    bottom: 0.9rem;
+    right: 1rem;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    font-size: 9px;
+    z-index: 2;
+    transition: opacity var(--transition), color var(--transition),
+                border-color var(--transition), background var(--transition),
+                transform 0.3s ease;
+    /* hidden on desktop until hover */
+    opacity: 0;
+  }
+
+  .project-card:hover .card-indicator {
+    opacity: 1;
+    color: var(--accent);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  .project-card.active .card-indicator {
+    transform: rotate(180deg);
+  }
+
+  /* mobile: no hover available — always show indicator */
+  @media (hover: none) {
+    .card-indicator {
+      opacity: 0.35;
+      animation: indicator-bob 2.4s ease-in-out infinite;
+    }
+
+    .project-card.active .card-indicator {
+      opacity: 0.6;
+      animation: none;
+    }
+  }
+
+  @keyframes indicator-bob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-3px); }
+  }
+
+  @media (max-width: 700px) {
+    #projects { padding: 3rem 6% 4rem; }
+    .project-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  gsap.registerPlugin(ScrollTrigger);
+
+  const GLITCH = "!<>-_\\/[]{}—=+*^?#@$%&";
+
+  function glitchReveal(el: HTMLElement, finalText: string, duration = 780) {
+    const frames = 18;
+    const ms = Math.round(duration / frames);
+    let frame = 0;
+    el.style.opacity = "1";
+
+    const iv = setInterval(() => {
+      const progress = frame / frames;
+      const revealed = Math.floor(progress * finalText.length);
+
+      let display = "";
+      for (let i = 0; i < finalText.length; i++) {
+        if (i < revealed) {
+          display += Math.random() < 0.07 * (1 - progress)
+            ? GLITCH[Math.floor(Math.random() * GLITCH.length)]
+            : finalText[i];
+        } else {
+          display += finalText[i] === " " ? "\u00a0"
+            : GLITCH[Math.floor(Math.random() * GLITCH.length)];
+        }
+      }
+      el.textContent = display;
+
+      if (frame < frames - 2 && Math.random() < 0.4) {
+        el.style.textShadow = `${+(Math.random()*4-2).toFixed(1)}px 0 rgba(255,0,200,0.6),`
+                            + `${+(Math.random()*-4+2).toFixed(1)}px 0 rgba(0,255,255,0.6)`;
+      } else {
+        el.style.textShadow = "";
+      }
+
+      frame++;
+      if (frame > frames) {
+        clearInterval(iv);
+        el.textContent      = finalText;
+        el.style.textShadow = "";
+      }
+    }, ms);
+  }
+
+  function initProjects() {
+    const label = document.getElementById("projects-label");
+    const title = document.getElementById("projects-title");
+    const cards = document.querySelectorAll<HTMLElement>(".project-card");
+    if (!label || !cards.length) return;
+
+    const titleText = title?.textContent ?? "Fun projects.";
+
+    /* ── Header reveal ───────────────────────── */
+    ScrollTrigger.create({
+      trigger: label,
+      start: "top 85%",
+      once: true,
+      onEnter: () => {
+        gsap.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" });
+        if (title) {
+          setTimeout(() => glitchReveal(title, titleText, 780), 150);
+        }
+      },
+    });
+
+    /* ── Card scroll reveals ─────────────────── */
+    gsap.fromTo(
+      cards,
+      { opacity: 0, y: 40, scale: 0.97 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        stagger: { amount: 0.45, from: "start" },
+        duration: 0.6,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: "#project-grid",
+          start: "top 80%",
+          once: true,
+        },
+      }
+    );
+
+    /* ── Card 3D tilt + sheen ────────────────── */
+    cards.forEach((card) => {
+      const sheen = card.querySelector<HTMLElement>(".card-sheen");
+
+      card.addEventListener("mousemove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const rx = ((e.clientY - rect.top)  / rect.height - 0.5) * 10;
+        const ry = ((e.clientX - rect.left) / rect.width  - 0.5) * -10;
+
+        gsap.to(card, {
+          rotationX: rx,
+          rotationY: ry,
+          duration: 0.4,
+          ease: "power2.out",
+          transformPerspective: 800,
+        });
+
+        if (sheen) {
+          const mx = ((e.clientX - rect.left) / rect.width)  * 100;
+          const my = ((e.clientY - rect.top)  / rect.height) * 100;
+          sheen.style.setProperty("--mx", mx + "%");
+          sheen.style.setProperty("--my", my + "%");
+        }
+      });
+
+      card.addEventListener("mouseleave", () => {
+        gsap.to(card, {
+          rotationX: 0,
+          rotationY: 0,
+          duration: 0.6,
+          ease: "elastic.out(1, 0.6)",
+          transformPerspective: 800,
+        });
+      });
+    });
+
+    /* ── Card toggle (full card click) ──────────── */
+    cards.forEach((card) => {
+      // stop link clicks from toggling the card
+      card.querySelectorAll("a").forEach(a => a.addEventListener("click", e => e.stopPropagation()));
+
+      card.addEventListener("click", () => {
+        const isNowActive = card.classList.toggle("active");
+        card.setAttribute("aria-expanded", String(isNowActive));
+      });
+
+      // keyboard support
+      card.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const isNowActive = card.classList.toggle("active");
+          card.setAttribute("aria-expanded", String(isNowActive));
+        }
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initProjects);
+</script>

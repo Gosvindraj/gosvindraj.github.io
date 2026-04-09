@@ -1,0 +1,201 @@
+---
+import Navbar from "../components/Navbar.astro";
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast and developer." } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Gosvindraj" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+  <body>
+    <!-- Preloader (persist across navigations so it only animates once) -->
+    <div id="preloader" transition:persist>
+      <div id="preloader-inner">
+        <div id="preloader-bar-wrap">
+          <div id="preloader-bar"></div>
+        </div>
+        <span id="preloader-count">000</span>
+      </div>
+    </div>
+
+    <!-- Ambient background orbs -->
+    <div id="ambient-bg" transition:persist>
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Custom cursor -->
+    <div id="cursor-dot"  transition:persist></div>
+    <div id="cursor-ring" transition:persist></div>
+
+    <Navbar />
+    <main>
+      <slot />
+    </main>
+
+    <footer id="site-footer">
+      <div class="footer-inner">
+        <span class="footer-name">Gosvindraj</span>
+        <span class="footer-sep">·</span>
+        <span class="footer-copy">&copy; {new Date().getFullYear()}</span>
+        <span class="footer-sep">·</span>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/in/gosvindraj-m-3306b9280/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+          <a href="https://www.instagram.com/gosv7ndraj/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://github.com/Gosvindraj" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      import gsap from "gsap";
+      import { ScrollTrigger } from "gsap/ScrollTrigger";
+      gsap.registerPlugin(ScrollTrigger);
+
+      /* ── ScrollTrigger cleanup on page transitions ── */
+      document.addEventListener("astro:before-swap", () => {
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+      });
+      document.addEventListener("astro:page-load", () => {
+        ScrollTrigger.refresh();
+      });
+
+      /* ── Preloader ──────────────────────────────── */
+      const preloader = document.getElementById("preloader");
+
+      if (preloader) {
+        if (sessionStorage.getItem("intro-seen")) {
+          // skip — hide instantly
+          preloader.style.display = "none";
+        } else {
+          const bar      = document.getElementById("preloader-bar")!;
+          const countEl  = document.getElementById("preloader-count")!;
+          document.body.style.overflow = "hidden";
+
+          // Drive a 0→100 counter linked to bar progress
+          const counter = { val: 0 };
+
+          const tl = gsap.timeline({
+            onComplete: () => {
+              preloader.style.display = "none";
+              document.body.style.overflow = "";
+              sessionStorage.setItem("intro-seen", "1");
+            },
+          });
+
+          tl
+            // bar fills over ~1s
+            .to(bar, {
+              width: "100%",
+              duration: 1.0,
+              ease: "power2.inOut",
+            })
+            // counter counts in sync
+            .to(counter, {
+              val: 100,
+              duration: 1.0,
+              ease: "power2.inOut",
+              onUpdate() {
+                const v = Math.round(counter.val);
+                countEl.textContent = v.toString().padStart(3, "0");
+              },
+            }, "<")
+            // brief pause at 100
+            .to({}, { duration: 0.18 })
+            // count fades out
+            .to(countEl, { opacity: 0, duration: 0.2, ease: "power2.in" })
+            // curtain wipes upward
+            .to(preloader, {
+              yPercent: -100,
+              duration: 0.7,
+              ease: "expo.inOut",
+            });
+        }
+      }
+
+      /* ── Cursor ─────────────────────────────────── */
+      const dot  = document.getElementById("cursor-dot")!;
+      const ring = document.getElementById("cursor-ring")!;
+
+      let mouseX = 0, mouseY = 0;
+      let ringX  = 0, ringY  = 0;
+      let prevX  = 0, prevY  = 0;
+
+      // center via xPercent/yPercent once
+      gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
+
+      document.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        gsap.set(dot, { x: mouseX, y: mouseY });
+
+        // speed trail
+        const speed = Math.hypot(mouseX - prevX, mouseY - prevY);
+        if (speed > 22) {
+          const trail = document.createElement("div");
+          trail.className = "cursor-trail";
+          document.body.appendChild(trail);
+          gsap.set(trail, { xPercent: -50, yPercent: -50, x: mouseX, y: mouseY });
+          gsap.to(trail, {
+            opacity: 0,
+            scale: 0,
+            duration: 0.32,
+            ease: "power2.out",
+            onComplete: () => trail.remove(),
+          });
+        }
+        prevX = mouseX;
+        prevY = mouseY;
+      });
+
+      // ring follows with GSAP ticker lerp (smoother than RAF)
+      gsap.ticker.add(() => {
+        ringX += (mouseX - ringX) * 0.1;
+        ringY += (mouseY - ringY) * 0.1;
+        gsap.set(ring, { x: ringX, y: ringY });
+      });
+
+      // rebind hover/text states after each navigation
+      function bindCursorStates() {
+        document.querySelectorAll("a, button, input, textarea, [data-cursor]").forEach((el) => {
+          el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
+          el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
+        });
+        document.querySelectorAll("p, h1, h2, h3, h4, li").forEach((el) => {
+          el.addEventListener("mouseenter", () => document.body.classList.add("cursor-text"));
+          el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-text"));
+        });
+      }
+
+      bindCursorStates();
+      document.addEventListener("astro:page-load", bindCursorStates);
+
+      /* ── Ambient orbs ───────────────────────────── */
+      gsap.to(".orb-1", { x: 180, y: -110, duration: 40, repeat: -1, yoyo: true, ease: "sine.inOut" });
+      gsap.to(".orb-2", { x: -150, y: 130,  duration: 28, repeat: -1, yoyo: true, ease: "sine.inOut" });
+      gsap.to(".orb-3", { x: 90,   y: -70,  duration: 35, repeat: -1, yoyo: true, ease: "sine.inOut" });
+    </script>
+  </body>
+</html>

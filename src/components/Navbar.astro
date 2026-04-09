@@ -1,0 +1,74 @@
+---
+const path = Astro.url.pathname;
+const links = [
+  { href: "/about",    label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/contact",  label: "Contact" },
+];
+---
+
+<header>
+  <a href="/"><div id="logo">GOSVINDRAJ</div></a>
+  <nav>
+    <ul class="nav_links">
+      {links.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            class={path.startsWith(link.href) ? "active" : ""}
+          >
+            <span class="nav-roll">
+              <span class="nav-roll-inner">
+                <span class="nav-roll-text">{link.label}</span>
+                <span class="nav-roll-text" aria-hidden="true">{link.label}</span>
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="toggle_btn" aria-label="Toggle menu">
+    <i class="fa-solid fa-bars"></i>
+  </div>
+  <ul class="dropdown_menu">
+    {links.map((link) => (
+      <li><a href={link.href}>{link.label}</a></li>
+    ))}
+  </ul>
+</header>
+
+<script>
+  import gsap from "gsap";
+
+  function initNavbar() {
+    /* ── Mobile toggle ───────────────────────── */
+    const toggleBtn    = document.querySelector(".toggle_btn");
+    const dropdownMenu = document.querySelector(".dropdown_menu");
+
+    toggleBtn?.addEventListener("click", () => dropdownMenu?.classList.toggle("open"));
+    dropdownMenu?.querySelectorAll("a").forEach((a) => {
+      a.addEventListener("click", () => dropdownMenu?.classList.remove("open"));
+    });
+
+    /* ── Nav text roll ───────────────────────── */
+    document.querySelectorAll(".nav_links a").forEach((link) => {
+      const inner = link.querySelector<HTMLElement>(".nav-roll-inner");
+      if (!inner) return;
+
+      // reset position on init
+      gsap.set(inner, { y: "0%" });
+
+      link.addEventListener("mouseenter", () => {
+        gsap.to(inner, { y: "-50%", duration: 0.28, ease: "power2.inOut" });
+      });
+
+      link.addEventListener("mouseleave", () => {
+        gsap.set(inner, { y: "50%" });
+        gsap.to(inner, { y: "0%", duration: 0.22, ease: "power2.out" });
+      });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initNavbar);
+</script>

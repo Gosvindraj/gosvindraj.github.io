@@ -1,0 +1,403 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Gosvindraj | Contact">
+  <section id="contact">
+    <div class="contact-inner">
+
+      <div class="contact-header" id="contact-header">
+        <p class="section-label" id="contact-label">Contact</p>
+        <h2 class="section-title" id="form-title">Let's talk.</h2>
+      </div>
+
+      <div id="contact-form-wrapper">
+        <form id="contact-form" autocomplete="off">
+          <div class="field">
+            <label for="name" class="sr-only">Name</label>
+            <input type="text"  id="name"    name="name"    placeholder="Name"    required />
+          </div>
+          <div class="field">
+            <label for="email" class="sr-only">Email</label>
+            <input type="email" id="email"   name="email"   placeholder="Email"   required />
+          </div>
+          <div class="field">
+            <label for="message" class="sr-only">Message</label>
+            <textarea id="message" name="message" rows="5" placeholder="Message" required></textarea>
+          </div>
+          <button type="submit" data-magnetic>
+            <span>Send message</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+        <div id="response-message"></div>
+      </div>
+
+      <div class="socials" id="contact-socials">
+        <span class="socials-label">Find me on</span>
+        <div class="socials-links">
+          <a href="https://www.linkedin.com/in/gosvindraj-m-3306b9280/" target="_blank" rel="noopener" class="social-link">
+            <i class="fa-brands fa-linkedin"></i>
+            <span>LinkedIn</span>
+          </a>
+          <a href="https://www.instagram.com/gosv7ndraj/" target="_blank" rel="noopener" class="social-link">
+            <i class="fa-brands fa-instagram"></i>
+            <span>Instagram</span>
+          </a>
+          <a href="https://www.facebook.com/gosvindraj.fuzz/" target="_blank" rel="noopener" class="social-link">
+            <i class="fa-brands fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #contact {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    align-items: center;
+    padding: 4rem 8%;
+  }
+
+  .contact-inner {
+    max-width: 560px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .contact-header { opacity: 0; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+  }
+
+  /* form */
+  #contact-form-wrapper { opacity: 0; }
+
+  #contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .field {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    transition: border-color var(--transition);
+  }
+
+  .field:focus-within { border-color: var(--accent); }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 1rem 0;
+    font-family: "Montserrat", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text);
+    resize: none;
+    cursor: none;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  #contact-form button[type="submit"] {
+    margin-top: 2rem;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    will-change: transform;
+  }
+
+  #contact-form button[type="submit"] i {
+    transition: transform var(--transition);
+    font-size: 11px;
+  }
+
+  #contact-form button[type="submit"]:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  #contact-form button[type="submit"]:hover i { transform: translateX(4px); }
+
+  /* response */
+  #response-message {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  #response-message.response-success {
+    display: block;
+    background: rgba(45, 140, 74, 0.12);
+    border: 1px solid rgba(45, 140, 74, 0.3);
+    color: #6fcf97;
+  }
+
+  #response-message.response-error {
+    display: block;
+    background: rgba(190, 60, 60, 0.1);
+    border: 1px solid rgba(190, 60, 60, 0.3);
+    color: #eb5757;
+    animation: fadeOut 4s forwards;
+  }
+
+  /* socials */
+  .socials {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    opacity: 0;
+  }
+
+  .socials-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .socials-links { display: flex; gap: 1.25rem; }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    cursor: none;
+    transition: color var(--transition);
+  }
+
+  .social-link i { font-size: 14px; }
+  .social-link:hover { color: var(--text); }
+
+  /* transitions */
+  .fade-out { opacity: 0; transition: opacity 0.4s ease; }
+  .fade-in  { opacity: 0; display: block; animation: fadeIn 0.4s ease forwards; }
+
+  @keyframes fadeIn  { to { opacity: 1; } }
+  @keyframes fadeOut {
+    0%, 75% { opacity: 1; }
+    100%    { opacity: 0; }
+  }
+
+  @media (max-width: 700px) {
+    #contact { padding: 3rem 6%; }
+    .social-link span { display: none; }
+    .social-link i { font-size: 1.4rem; }
+  }
+</style>
+
+<script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js" is:inline></script>
+<script is:inline>
+  // @ts-nocheck
+  emailjs.init("nWphQI8z1ReghKuBL");
+</script>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { TextPlugin }    from "gsap/TextPlugin";
+  gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+  const GLITCH = "!<>-_\\/[]{}—=+*^?#@$%&";
+
+  function glitchReveal(el: HTMLElement, finalText: string, duration = 780) {
+    const frames = 18;
+    const ms = Math.round(duration / frames);
+    let frame = 0;
+    el.style.opacity = "1";
+
+    const iv = setInterval(() => {
+      const progress = frame / frames;
+      const revealed = Math.floor(progress * finalText.length);
+
+      let display = "";
+      for (let i = 0; i < finalText.length; i++) {
+        if (i < revealed) {
+          display += Math.random() < 0.07 * (1 - progress)
+            ? GLITCH[Math.floor(Math.random() * GLITCH.length)]
+            : finalText[i];
+        } else {
+          display += finalText[i] === " " ? "\u00a0"
+            : GLITCH[Math.floor(Math.random() * GLITCH.length)];
+        }
+      }
+      el.textContent = display;
+
+      if (frame < frames - 2 && Math.random() < 0.4) {
+        el.style.textShadow = `${+(Math.random()*4-2).toFixed(1)}px 0 rgba(255,0,200,0.6),`
+                            + `${+(Math.random()*-4+2).toFixed(1)}px 0 rgba(0,255,255,0.6)`;
+      } else {
+        el.style.textShadow = "";
+      }
+
+      frame++;
+      if (frame > frames) {
+        clearInterval(iv);
+        el.textContent      = finalText;
+        el.style.textShadow = "";
+      }
+    }, ms);
+  }
+
+  function initContact() {
+    const header  = document.getElementById("contact-header");
+    const title   = document.getElementById("form-title");
+    const wrapper = document.getElementById("contact-form-wrapper");
+    const socials = document.getElementById("contact-socials");
+    if (!header) return;
+
+    const titleText = title?.textContent ?? "Let's talk.";
+
+    gsap.set([header, wrapper, socials], { opacity: 0, y: 20 });
+
+    /* ── Header glitch reveal on scroll ──────── */
+    ScrollTrigger.create({
+      trigger: header,
+      start: "top 80%",
+      once: true,
+      onEnter: () => {
+        gsap.to(header, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
+        if (title) setTimeout(() => glitchReveal(title, titleText, 780), 200);
+      },
+    });
+
+    /* ── Form fades in ───────────────────────── */
+    ScrollTrigger.create({
+      trigger: wrapper,
+      start: "top 85%",
+      once: true,
+      onEnter: () => gsap.to(wrapper, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", delay: 0.1 }),
+    });
+
+    /* ── Socials fade in ──────────────────────── */
+    ScrollTrigger.create({
+      trigger: socials,
+      start: "top 90%",
+      once: true,
+      onEnter: () => gsap.to(socials, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", delay: 0.15 }),
+    });
+
+    /* ── Social icon pop on hover ─────────────── */
+    document.querySelectorAll(".social-link").forEach((link) => {
+      link.addEventListener("mouseenter", () => {
+        const icon = link.querySelector("i");
+        if (!icon) return;
+        gsap.fromTo(
+          icon,
+          { scale: 1, rotate: 0 },
+          { scale: 1.35, rotate: -12, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out" }
+        );
+      });
+    });
+
+    /* ── Magnetic submit button ───────────────── */
+    const submitBtn = document.querySelector<HTMLElement>("[data-magnetic]");
+    if (submitBtn) {
+      submitBtn.addEventListener("mousemove", (e) => {
+        const rect = submitBtn.getBoundingClientRect();
+        const cx = rect.left + rect.width  / 2;
+        const cy = rect.top  + rect.height / 2;
+        gsap.to(submitBtn, {
+          x: (e.clientX - cx) * 0.4,
+          y: (e.clientY - cy) * 0.4,
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      });
+      submitBtn.addEventListener("mouseleave", () => {
+        gsap.to(submitBtn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.5)" });
+      });
+    }
+  }
+
+  document.addEventListener("astro:page-load", initContact);
+
+  /* ── EmailJS submit ───────────────────────────── */
+  function initForm() {
+    document.getElementById("contact-form")?.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // @ts-ignore
+      emailjs.sendForm("service_2fltq5k", "template_uoi0y6r", this).then(
+        () => {
+          const form    = document.getElementById("contact-form")    as HTMLElement;
+          const wrapper = document.getElementById("contact-form-wrapper") as HTMLElement;
+          const title   = document.getElementById("form-title")      as HTMLElement;
+
+          wrapper.style.minHeight = wrapper.getBoundingClientRect().height + "px";
+          form.classList.add("fade-out");
+          title.classList.add("fade-out");
+
+          setTimeout(() => {
+            form.style.display  = "none";
+            title.style.display = "none";
+            const msg = document.getElementById("response-message") as HTMLElement;
+            msg.className = "response-success fade-in";
+            msg.innerHTML = "Message sent — I'll get back to you soon.";
+          }, 400);
+        },
+        () => {
+          const msg = document.getElementById("response-message") as HTMLElement;
+          msg.className = "response-error";
+          msg.innerHTML = "Something went wrong. Please try again.";
+          setTimeout(() => { msg.className = ""; msg.innerHTML = ""; }, 4000);
+        }
+      );
+    });
+  }
+
+  document.addEventListener("astro:page-load", initForm);
+</script>

@@ -1,0 +1,319 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Gosvindraj | BTC Price in MYR">
+  <section id="project-crypto">
+    <div class="project-inner">
+
+      <div class="project-header">
+        <p class="section-label">project 02</p>
+        <h1 class="project-title">BTC Price in MYR</h1>
+        <p class="project-desc">
+          fetches the live bitcoin price in USD from CoinGecko and the
+          USD/MYR exchange rate, then converts. real-time, no cache.
+        </p>
+        <a href="/projects" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>back to projects</span>
+        </a>
+      </div>
+
+      <div class="crypto-wrap">
+        <div class="crypto-card" id="crypto-card">
+
+          <div class="rate-row" id="row-myr">
+            <span class="rate-label">USD / MYR</span>
+            <span class="rate-val" id="rate-myr">—</span>
+          </div>
+          <div class="rate-row" id="row-btc">
+            <span class="rate-label">BTC / USD</span>
+            <span class="rate-val" id="btc-usd">—</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="result-row" id="result-row">
+            <span class="result-label">BTC in MYR</span>
+            <span class="result-val" id="btc-myr">—</span>
+          </div>
+
+          <button id="fetch-btn" type="button" data-magnetic>
+            <span id="btn-text">Fetch live price</span>
+            <i class="fa-solid fa-arrow-right" id="btn-icon"></i>
+          </button>
+
+          <p class="error-msg" id="error-msg"></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #project-crypto {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    align-items: center;
+    padding: 4rem 8%;
+  }
+
+  .project-inner {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 6rem;
+  }
+
+  /* left */
+  .project-header {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .project-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .project-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    align-self: flex-start;
+  }
+
+  .back-link i { font-size: 10px; transition: transform var(--transition); }
+  .back-link:hover { color: var(--text); border-color: var(--border-hover); background: var(--accent-dim); }
+  .back-link:hover i { transform: translateX(-3px); }
+
+  /* right */
+  .crypto-wrap {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    opacity: 0;
+  }
+
+  .crypto-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-color: var(--border-hover);
+    padding: 2rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .rate-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rate-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .rate-val {
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border-hover);
+    margin: 1.25rem 0;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 1.75rem;
+    gap: 1rem;
+  }
+
+  .result-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .result-val {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 300;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    text-align: right;
+  }
+
+  #fetch-btn {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: "Montserrat", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    will-change: transform;
+  }
+
+  #fetch-btn i { font-size: 11px; transition: transform var(--transition); }
+  #fetch-btn:hover { color: var(--text); border-color: var(--border-hover); background: var(--accent-dim); }
+  #fetch-btn:hover i { transform: translateX(4px); }
+  #fetch-btn:disabled { opacity: 0.45; cursor: default; }
+
+  .error-msg {
+    display: none;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #eb5757;
+    letter-spacing: 0.04em;
+  }
+
+  .error-msg.visible { display: block; }
+
+  @media (max-width: 900px) {
+    .project-inner { flex-direction: column; gap: 3rem; }
+    .project-header { flex: none; }
+  }
+
+  @media (max-width: 500px) {
+    #project-crypto { padding: 3rem 6%; }
+    .crypto-card { padding: 1.5rem; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  function initCrypto() {
+    const header     = document.querySelector<HTMLElement>(".project-header");
+    const cryptoWrap = document.querySelector<HTMLElement>(".crypto-wrap");
+    if (!header || !cryptoWrap) return;
+
+    // entrance
+    gsap.fromTo(header,     { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 });
+    gsap.fromTo(cryptoWrap, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
+
+    const btn      = document.getElementById("fetch-btn")      as HTMLButtonElement;
+    const btnText  = document.getElementById("btn-text")       as HTMLElement;
+    const rateMyr  = document.getElementById("rate-myr")       as HTMLElement;
+    const btcUsd   = document.getElementById("btc-usd")        as HTMLElement;
+    const btcMyr   = document.getElementById("btc-myr")        as HTMLElement;
+    const errorMsg = document.getElementById("error-msg")      as HTMLElement;
+    if (!btn) return;
+
+    function fmt(n: number, decimals = 2) {
+      return n.toLocaleString("en-MY", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function flashVal(el: HTMLElement) {
+      gsap.fromTo(el, { color: "var(--accent)" }, { color: "", duration: 0.8, ease: "power2.out" });
+    }
+
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      btnText.textContent = "Fetching...";
+      errorMsg.classList.remove("visible");
+
+      try {
+        const [myrRes, btcRes] = await Promise.all([
+          fetch("https://api.exchangerate-api.com/v4/latest/USD"),
+          fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"),
+        ]);
+
+        const [myrData, btcData] = await Promise.all([myrRes.json(), btcRes.json()]);
+
+        const myrRate   = myrData.rates.MYR as number;
+        const btcPrice  = btcData.bitcoin.usd as number;
+        const converted = btcPrice * myrRate;
+
+        rateMyr.textContent = fmt(myrRate, 4);
+        btcUsd.textContent  = `$${fmt(btcPrice, 2)}`;
+        btcMyr.textContent  = `RM ${fmt(converted, 2)}`;
+
+        flashVal(rateMyr);
+        flashVal(btcUsd);
+        flashVal(btcMyr);
+      } catch {
+        errorMsg.textContent = "couldn't reach the APIs. try again.";
+        errorMsg.classList.add("visible");
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Fetch live price";
+      }
+    });
+
+    // magnetic button
+    btn.addEventListener("mousemove", (e) => {
+      const rect = btn.getBoundingClientRect();
+      gsap.to(btn, {
+        x: (e.clientX - rect.left - rect.width  / 2) * 0.4,
+        y: (e.clientY - rect.top  - rect.height / 2) * 0.4,
+        duration: 0.3, ease: "power2.out",
+      });
+    });
+    btn.addEventListener("mouseleave", () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.5)" });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initCrypto);
+</script>
