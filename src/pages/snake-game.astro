@@ -1,0 +1,334 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Gosvindraj | Snake Game">
+  <section id="project-snake">
+    <div class="project-inner">
+
+      <div class="project-header">
+        <p class="section-label">project 01</p>
+        <h1 class="project-title">2D Snake Game</h1>
+        <p class="project-desc">
+          classic snake — built with vanilla JS and a canvas. use arrow keys to move,
+          eat the food, don't hit the walls (or yourself).
+        </p>
+        <a href="/projects" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>back to projects</span>
+        </a>
+      </div>
+
+      <div class="game-wrap">
+        <div class="game-meta">
+          <span id="score-label">score <span id="score-val">0</span></span>
+          <span class="meta-sep">·</span>
+          <span id="hi-label">best <span id="hi-val">0</span></span>
+        </div>
+        <canvas id="gameCanvas" width="400" height="400" tabindex="0"></canvas>
+        <p class="game-hint" id="game-hint">press <kbd>enter</kbd> to start</p>
+      </div>
+
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #project-snake {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    align-items: center;
+    padding: 4rem 8%;
+  }
+
+  .project-inner {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 6rem;
+  }
+
+  /* left column */
+  .project-header {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .project-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .project-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    align-self: flex-start;
+  }
+
+  .back-link i { font-size: 10px; transition: transform var(--transition); }
+  .back-link:hover { color: var(--text); border-color: var(--border-hover); background: var(--accent-dim); }
+  .back-link:hover i { transform: translateX(-3px); }
+
+  /* right column */
+  .game-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    opacity: 0;
+  }
+
+  .game-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-sep { opacity: 0.35; }
+
+  #score-val, #hi-val { color: var(--accent); }
+
+  canvas {
+    background: #000;
+    border: 1px solid var(--border);
+    outline: none;
+    display: block;
+    max-width: 100%;
+  }
+
+  .game-hint {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  kbd {
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.1rem 0.35rem;
+    color: var(--text);
+  }
+
+  @media (max-width: 900px) {
+    .project-inner { flex-direction: column; gap: 3rem; }
+    .project-header { flex: none; }
+    .game-wrap { align-items: flex-start; }
+  }
+
+  @media (max-width: 500px) {
+    #project-snake { padding: 3rem 6%; }
+    canvas { width: 100% !important; height: auto !important; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  function initSnake() {
+    const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    const hintEl    = document.getElementById("game-hint");
+    const scoreEl   = document.getElementById("score-val");
+    const hiEl      = document.getElementById("hi-val");
+    const header    = document.querySelector<HTMLElement>(".project-header");
+    const gameWrap  = document.querySelector<HTMLElement>(".game-wrap");
+
+    // entrance
+    gsap.to(header,   { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 });
+    gsap.fromTo(header, { y: 20 }, { y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 });
+    gsap.to(gameWrap, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
+    gsap.fromTo(gameWrap, { y: 20 }, { y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
+
+    const BOX = 20;
+    let snake: { x: number; y: number }[];
+    let direction: string;
+    let food: { x: number; y: number };
+    let score: number;
+    let highScore = parseInt(localStorage.getItem("snakeHighScore") ?? "0") || 0;
+    let gameState: string;
+    let game: ReturnType<typeof setInterval>;
+
+    if (hiEl) hiEl.textContent = String(highScore);
+
+    function getRandomFood() {
+      let f: { x: number; y: number };
+      do {
+        f = { x: Math.floor(Math.random() * 20) * BOX, y: Math.floor(Math.random() * 20) * BOX };
+      } while (snake.some(s => s.x === f.x && s.y === f.y));
+      return f;
+    }
+
+    function init() {
+      snake     = [{ x: 9 * BOX, y: 9 * BOX }];
+      direction = "RIGHT";
+      score     = 0;
+      food      = getRandomFood();
+      gameState = "start";
+      if (scoreEl) scoreEl.textContent = "0";
+      render();
+    }
+
+    function startGame() {
+      snake     = [{ x: 9 * BOX, y: 9 * BOX }];
+      direction = "RIGHT";
+      score     = 0;
+      food      = getRandomFood();
+      gameState = "playing";
+      if (hintEl) hintEl.style.visibility = "hidden";
+      canvas.focus();
+      if (game) clearInterval(game);
+      game = setInterval(() => { update(); render(); }, 100);
+    }
+
+    function update() {
+      const head = { x: snake[0].x, y: snake[0].y };
+      if (direction === "LEFT")  head.x -= BOX;
+      if (direction === "UP")    head.y -= BOX;
+      if (direction === "RIGHT") head.x += BOX;
+      if (direction === "DOWN")  head.y += BOX;
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        if (scoreEl) scoreEl.textContent = String(score);
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("snakeHighScore", String(highScore));
+          if (hiEl) hiEl.textContent = String(highScore);
+        }
+        food = getRandomFood();
+      } else {
+        snake.pop();
+      }
+
+      const hitWall = head.x < 0 || head.x >= 20 * BOX || head.y < 0 || head.y >= 20 * BOX;
+      const hitSelf = snake.some(s => s.x === head.x && s.y === head.y);
+
+      if (hitWall || hitSelf) {
+        clearInterval(game);
+        gameState = "gameover";
+        if (hintEl) { hintEl.style.visibility = "visible"; hintEl.innerHTML = `press <kbd>enter</kbd> to play again`; }
+      } else {
+        snake.unshift(head);
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (gameState === "start") {
+        ctx.fillStyle = "rgba(155,109,206,0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255,255,255,0.12)";
+        ctx.font = "bold 18px 'Courier New', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("SNAKE", canvas.width / 2, canvas.height / 2 - 10);
+        ctx.fillStyle = "rgba(155,109,206,0.5)";
+        ctx.font = "11px 'Courier New', monospace";
+        ctx.fillText("PRESS ENTER TO START", canvas.width / 2, canvas.height / 2 + 18);
+        return;
+      }
+
+      // grid dots
+      ctx.fillStyle = "rgba(255,255,255,0.03)";
+      for (let x = 0; x < 20; x++) {
+        for (let y = 0; y < 20; y++) {
+          ctx.fillRect(x * BOX + BOX / 2 - 1, y * BOX + BOX / 2 - 1, 2, 2);
+        }
+      }
+
+      // food — accent purple glow
+      ctx.shadowColor = "rgba(155,109,206,0.8)";
+      ctx.shadowBlur  = 8;
+      ctx.fillStyle   = "rgba(155,109,206,0.9)";
+      ctx.fillRect(food.x + 3, food.y + 3, BOX - 6, BOX - 6);
+      ctx.shadowBlur  = 0;
+
+      // snake
+      snake.forEach((seg, idx) => {
+        const alpha = idx === 0 ? 1 : Math.max(0.3, 1 - idx * 0.04);
+        ctx.fillStyle = idx === 0 ? `rgba(220,210,255,${alpha})` : `rgba(155,109,206,${alpha})`;
+        ctx.fillRect(seg.x + 1, seg.y + 1, BOX - 2, BOX - 2);
+      });
+
+      if (gameState === "gameover") {
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font      = "bold 16px 'Courier New', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 24);
+        ctx.fillStyle = "rgba(155,109,206,0.8)";
+        ctx.font      = "12px 'Courier New', monospace";
+        ctx.fillText(`score: ${score}  ·  best: ${highScore}`, canvas.width / 2, canvas.height / 2 + 4);
+      }
+    }
+
+    function changeDirection(e: KeyboardEvent) {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+      }
+      if ((gameState === "start" || gameState === "gameover") && e.key === "Enter") {
+        startGame();
+      } else if (gameState === "playing") {
+        if (e.key === "ArrowLeft"  && direction !== "RIGHT") direction = "LEFT";
+        if (e.key === "ArrowUp"    && direction !== "DOWN")  direction = "UP";
+        if (e.key === "ArrowRight" && direction !== "LEFT")  direction = "RIGHT";
+        if (e.key === "ArrowDown"  && direction !== "UP")    direction = "DOWN";
+      }
+    }
+
+    window.addEventListener("keydown", changeDirection);
+    canvas.focus();
+    init();
+
+    // cleanup on page leave
+    document.addEventListener("astro:before-swap", () => {
+      window.removeEventListener("keydown", changeDirection);
+      if (game) clearInterval(game);
+    }, { once: true });
+  }
+
+  document.addEventListener("astro:page-load", initSnake);
+</script>

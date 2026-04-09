@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Personal portfolio of Gosvindraj, AI enthusiast and developer."
+    />
+    <meta name="author" content="Gosvindraj" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="navbar.css" />
+    <link rel="stylesheet" href="contact-form.css" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Gosvindraj | Snake Game</title>
+  </head>
+    <style>
+      /* Center the canvas on the page */
+      .canvas-wrapper {
+        display: flex;              /* turn body into a flex container */
+        justify-content: center;    /* center children left–right */
+        align-items: center;
+        height: 100%;
+        margin: 0;   
+      }
+      /* Black background for the game area */
+      canvas {
+        background: #000;
+        outline: none; 
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a href="index.html"><div id="logo">GOSVINDRAJ</div></a>
+      <nav>
+        <ul class="nav_links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="project.html">Projects</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="toggle_btn">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+      <div class="dropdown_menu">
+        <li><a href="about.html">About</a></li>
+        <li><a href="project.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </div>
+    </header>
+    <!-- The HTML canvas where the game will be drawn -->
+     <div class="canvas-wrapper"><canvas id="gameCanvas" width="400" height="400" tabindex="0"></canvas></div>
+
+
+    <script src="script.js"></script>
+        <script>
+      // Get a reference to the <canvas> element and its drawing context
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Size of each square (snake segment and food)
+      const box = 20;
+
+      // Game state variables (initialized later)
+      let snake; // Array of objects representing each segment of the snake
+      let direction; // Current movement direction of the snake ('UP', 'DOWN', 'LEFT', 'RIGHT')
+      let food; // Object with x, y coordinates of the food
+      let score; // Current score in this round
+      let highScore; // Highest score ever achieved (saved in localStorage)
+      let gameState; // 'start', 'playing', or 'gameover'
+      let game; // Interval ID for the game loop timer
+
+      /**
+       * init()
+       * Sets up initial values and draws the start screen.
+       */
+      function init() {
+        // Place the snake in the middle with a single segment
+        snake = [{ x: 9 * box, y: 9 * box }];
+        direction = "RIGHT"; // Default starting direction
+        score = 0; // Reset current score
+        // Load high score from browser storage, or start at 0
+        highScore = parseInt(localStorage.getItem("snakeHighScore")) || 0;
+
+        // Generate initial food location
+        food = getRandomFood();
+
+        // Set game state to show the start screen
+        gameState = "start";
+        render(); // Draw the start screen
+      }
+
+      /**
+       * startGame()
+       * Resets variables and begins the game loop.
+       */
+      function startGame() {
+        snake = [{ x: 9 * box, y: 9 * box }];
+        direction = "RIGHT";
+        score = 0;
+        food = getRandomFood();
+        gameState = "playing";
+
+        // Ensure the canvas has keyboard focus
+        canvas.focus();
+
+        // If a previous loop exists, clear it before starting a new one
+        if (game) clearInterval(game);
+
+        // Run update() and render() every 100ms
+        game = setInterval(() => {
+          update();
+          render();
+        }, 100);
+      }
+
+      /**
+       * update()
+       * Moves the snake, handles eating food, updates the score,
+       * and checks for collisions (game over).
+       */
+      function update() {
+        // Copy current head position
+        const head = { x: snake[0].x, y: snake[0].y };
+
+        // Move head position based on direction
+        if (direction === "LEFT") head.x -= box;
+        if (direction === "UP") head.y -= box;
+        if (direction === "RIGHT") head.x += box;
+        if (direction === "DOWN") head.y += box;
+
+        // Check if head is on the food
+        if (head.x === food.x && head.y === food.y) {
+          score++; // Increase score
+
+          // Update high score in real-time if needed
+          if (score > highScore) {
+            highScore = score;
+            localStorage.setItem("snakeHighScore", highScore);
+          }
+
+          // Generate a new food location
+          food = getRandomFood();
+        } else {
+          // Remove last segment to move snake forward
+          snake.pop();
+        }
+
+        // Check for collisions with walls or self
+        const hitWall =
+          head.x < 0 || head.x >= 20 * box || head.y < 0 || head.y >= 20 * box;
+        const hitSelf = snake.some(
+          (seg) => seg.x === head.x && seg.y === head.y
+        );
+
+        if (hitWall || hitSelf) {
+          clearInterval(game); // Stop the game loop
+          gameState = "gameover"; // Switch to game over state
+        } else {
+          // Add the new head at the front of the snake array
+          snake.unshift(head);
+        }
+      }
+
+      /**
+       * render()
+       * Draws the entire game screen based on gameState:
+       * - 'start': show the title and instructions
+       * - 'playing': draw snake, food, and score
+       * - 'gameover': overlay game over text
+       */
+      function render() {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (gameState === "start") {
+          // Draw start screen
+          ctx.fillStyle = "white";
+          ctx.font = "24px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Snake Game", canvas.width / 2, canvas.height / 2 - 20);
+          ctx.font = "16px Arial";
+          ctx.fillText(
+            "Press Enter to Start",
+            canvas.width / 2,
+            canvas.height / 2 + 20
+          );
+          return;
+        }
+
+        //--- Draw the snake ---
+        snake.forEach((seg, idx) => {
+          // Head is green, body is white
+          ctx.fillStyle = idx === 0 ? "lime" : "white";
+          ctx.fillRect(seg.x, seg.y, box, box);
+          ctx.strokeStyle = "black";
+          ctx.strokeRect(seg.x, seg.y, box, box);
+        });
+
+        //--- Draw the food ---
+        ctx.fillStyle = "red";
+        ctx.fillRect(food.x, food.y, box, box);
+
+        //--- Draw current score and high score ---
+        ctx.fillStyle = "white";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText(`Score: ${score}`, 5, 18);
+        ctx.textAlign = "right";
+        ctx.fillText(`High Score: ${highScore}`, canvas.width - 5, 18);
+
+        //--- If game is over, show overlay ---
+        if (gameState === "gameover") {
+          // Dark transparent overlay
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          ctx.fillStyle = "white";
+          ctx.font = "24px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 40);
+          ctx.font = "16px Arial";
+          ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
+          ctx.fillText(
+            `High: ${highScore}`,
+            canvas.width / 2,
+            canvas.height / 2 + 20
+          );
+          ctx.fillText(
+            "Press Enter to Play Again",
+            canvas.width / 2,
+            canvas.height / 2 + 60
+          );
+        }
+      }
+
+      /**
+       * getRandomFood()
+       * Returns a random location for the food that does not overlap the snake's body.
+       */
+      function getRandomFood() {
+        let newFood;
+        do {
+          // Pick random x and y (20 columns/rows)
+          newFood = {
+            x: Math.floor(Math.random() * 20) * box,
+            y: Math.floor(Math.random() * 20) * box,
+          };
+
+          // Repeat if food is on the snake
+        } while (
+          snake.some((seg) => seg.x === newFood.x && seg.y === newFood.y)
+        );
+
+        return newFood;
+      }
+
+      /**
+       * changeDirection(event)
+       * Handles keyboard input for:
+       * - Starting or restarting the game (Enter key)
+       * - Changing snake direction (Arrow keys)
+       */
+      function changeDirection(event) {
+        const key = event.key;
+
+        // Start game on Enter if at start screen or after game over
+        if (
+          (gameState === "start" || gameState === "gameover") &&
+          key === "Enter"
+        ) {
+          startGame();
+        }
+        // Change direction during play
+        else if (gameState === "playing") {
+          if (key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+          if (key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+          if (key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+          if (key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+        }
+      }
+
+      // Listen for keyboard events
+      window.addEventListener("keydown", changeDirection);
+
+      // Give the canvas keyboard focus so arrow keys work immediately
+      canvas.focus();
+
+      // Run initial setup
+      init();
+    </script>
+  </body>
+</html>

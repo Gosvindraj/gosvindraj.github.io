@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="description"
+      content="Personal portfolio of Gosvindraj, AI enthusiast and developer."
+    />
+    <meta name="author" content="Gosvindraj" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -11,10 +15,11 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>Gosvindraj | About</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="navbar.css" />
-    <link rel="stylesheet" href="about.css" />
+    <link rel="stylesheet" href="crypto-api.css" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Gosvindraj | Project</title>
   </head>
   <body>
     <header>
@@ -35,13 +40,17 @@
         <li><a href="contact.html">Contact</a></li>
       </div>
     </header>
-    <section id="about">
-      <h1>
-        <span id="typewriter-container" class="typewriter"
-          ><span id="typewriter"></span><span class="cursor">|</span>
-        </span>
-      </h1>
-    </section>
+    <div class="display">
+      <div class="convert_box">
+        <h3>USD/MYR Rate: <span id="rate_myr"></span></h3>
+        <h3>BTC Price in USD: <span id="btc_price"></span></h3>
+        <button class="convert_button">Fetch & Convert</button>
+        <h3>
+          <span id="btc_price_myr"></span>
+        </h3>
+      </div>
+    </div>
+    <script src="crypto-api.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Console Chat</title>
+  </head>
+  <body>
+    <h1>Open your console to use WebSocket</h1>
+
+    <script>
+      // Open a WebSocket connection
+      const socket = new WebSocket("wss://ws.postman-echo.com/raw");
+
+      // Save it to the window so you can use it in the console
+      window.ws = socket;
+
+      socket.onopen = () => {
+        console.log(
+          "✅ WebSocket connected. Use ws.send('your message') in the console."
+        );
+      };
+
+      socket.onmessage = (event) => {
+        console.log("💬 Received:", event.data);
+      };
+
+      socket.onerror = (error) => {
+        console.error("❌ WebSocket error:", error);
+      };
+
+      socket.onclose = () => {
+        console.log("🔌 WebSocket disconnected.");
+      };
+    </script>
+  </body>
+</html>
