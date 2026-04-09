@@ -169,6 +169,10 @@ const cards = [
 
     <!-- selector cards -->
     <div class="explore-cards" id="explore-cards">
+      <div class="ec-center-hint" id="ec-center-hint">
+        <span class="ec-center-ring"></span>
+        <span class="ec-center-text">pick<br/>one</span>
+      </div>
       {cards.map((c) => (
         <div class="ec-card-wrap">
           <button class="ec-card" data-card={c.id} aria-label={c.title}>
@@ -178,7 +182,6 @@ const cards = [
             <div class="ec-meta">
               <span class="ec-tag">{c.tag}</span>
             </div>
-            <i class="fa-solid fa-arrow-right ec-arrow"></i>
           </button>
         </div>
       ))}
@@ -326,6 +329,49 @@ const cards = [
     overflow: visible;
   }
 
+  /* ── Orbit centre hint ───────────────────────── */
+  .ec-center-hint {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .ec-center-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(155, 109, 206, 0.25);
+    animation: ec-ring-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes ec-ring-pulse {
+    0%, 100% { transform: scale(1);    opacity: 0.5; }
+    50%       { transform: scale(1.12); opacity: 1;   }
+  }
+
+  .ec-center-text {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.55;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 900px) {
+    .ec-center-hint { display: none; }
+  }
+
   .ec-card-wrap {
     position: absolute;
     width: 145px;
@@ -421,16 +467,6 @@ const cards = [
     text-overflow: ellipsis;
   }
 
-  .ec-arrow {
-    font-size: 10px;
-    color: var(--muted);
-    flex-shrink: 0;
-    transition: color var(--transition), transform var(--transition);
-    transform: rotate(90deg);
-  }
-
-  .ec-card:hover .ec-arrow  { color: var(--accent); transform: rotate(90deg) translateX(-2px); }
-  .ec-card.active .ec-arrow { color: var(--accent); transform: rotate(90deg) translateX(-2px); }
 
   /* ── Dynamic panel ───────────────────────────── */
   .explore-panel {
@@ -1043,6 +1079,9 @@ const cards = [
       /* active class */
       ecCards.forEach((c, i) => c.classList.toggle("active", i === clickedIdx));
 
+      /* hide centre hint */
+      gsap.to("#ec-center-hint", { opacity: 0, scale: 0.8, duration: 0.3, ease: "power2.in" });
+
       /* clicked card → center */
       stopFloat(clickedIdx);
       gsap.to(ecWraps[clickedIdx], { x: CENTER.x, y: CENTER.y, duration: 0.65, ease: "power3.inOut" });
@@ -1097,6 +1136,9 @@ const cards = [
           gsap.to(card, { rotation: ROTATIONS[i], scale: 1, duration: 0.6, ease: "power3.inOut" });
         }
       });
+
+      /* restore centre hint */
+      gsap.to("#ec-center-hint", { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out", delay: 0.25 });
 
       if (panelOpen) {
         gsap.to(panelWrap, { opacity: 0, y: 20, duration: 0.4, ease: "power2.in" });
