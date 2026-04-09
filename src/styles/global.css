@@ -398,6 +398,14 @@ main {
   #site-footer { display: none; }
 }
 
+@media (hover: none), (pointer: coarse) {
+  #cursor-dot,
+  #cursor-ring,
+  .cursor-trail { display: none !important; }
+
+  * { cursor: auto !important; }
+}
+
 /* ── Utility ───────────────────────────────────── */
 .sr-only {
   position: absolute;
