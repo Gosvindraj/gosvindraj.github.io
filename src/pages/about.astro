@@ -136,7 +136,7 @@ const cards = [
 ];
 ---
 
-<BaseLayout title="Gosvindraj | About">
+<BaseLayout title="Gosvindraj | About" hideFooter={true}>
 
   <!-- Section Nav removed — HTML preserved in style/script comments below -->
 
@@ -144,24 +144,80 @@ const cards = [
 
   <!-- ── Intro ───────────────────────────────────── -->
   <section id="about-intro">
-    <div class="intro-inner">
-      <p class="section-label" id="intro-label">about me</p>
-      <h1 class="intro-heading" id="intro-heading">
-        <span class="char-wrap"><span class="char-line">hi, i'm</span></span>
-        <span class="char-wrap accent-word"><span class="char-line">gosh.</span></span>
-      </h1>
-      <div class="intro-bio" id="intro-bio">
-        <p>
-          i get obsessed with things quickly — AI, blockchain, whatever's next —
-          and i build stuff to understand them better.
-          most of it goes nowhere. some of it actually works.
-          all of it teaches me something.
-        </p>
-        <p>
-          click one of the <span style="font-family: monospace;">›</span> card to explore. or don't. your call.
-        </p>
+
+    <!-- default view: hi, i'm gosh -->
+    <div id="intro-default">
+      <div class="intro-inner">
+        <p class="section-label" id="intro-label">about me</p>
+        <h1 class="intro-heading" id="intro-heading">
+          <span class="char-wrap"><span class="char-line">hi, i'm</span></span>
+          <span class="char-wrap accent-word"><span class="char-line">gosh.</span></span>
+        </h1>
+        <div class="intro-bio" id="intro-bio">
+          <p>
+            i get obsessed with things quickly — AI, blockchain, whatever's next —
+            and i build stuff to understand them better.
+            most of it goes nowhere. some of it actually works.
+            all of it teaches me something.
+          </p>
+          <p>
+            click one of the <span style="font-family: monospace;">›</span> card to explore. or don't. your call.
+          </p>
+        </div>
       </div>
     </div>
+
+    <!-- panel view: card content (swaps in on card select) -->
+    <div id="intro-panel">
+
+      <!-- journey panel (timeline) -->
+      <div class="ep-content" data-panel="journey">
+        <div class="ep-header">
+          <span class="ep-tag">origin story</span>
+          <h3 class="ep-title">how i got here</h3>
+          <p class="ep-desc">in chronological order, because i respect your time</p>
+        </div>
+        <div class="tl-list">
+          {timeline.map((entry, i) => (
+            <div class="tl-row" data-tl-index={i}>
+              <div class="tl-left-col">
+                <span class="tl-year">{entry.year}</span>
+                <div class="tl-vline"></div>
+              </div>
+              <div class="tl-card">
+                <h4 class="tl-title">{entry.title}</h4>
+                <p class="tl-place">{entry.place}</p>
+                <p class="tl-desc">{entry.desc}</p>
+                <div class="tl-tags">
+                  {entry.tags.map(t => <span class="tl-tag">{t}</span>)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- all other panels -->
+      {cards.filter(c => c.id !== "journey").map((c) => (
+        <div class="ep-content" data-panel={c.id} style="display:none">
+          <div class="ep-header">
+            <span class="ep-tag">{c.tag}</span>
+            <h3 class="ep-title">{c.title}</h3>
+            <p class="ep-desc">{c.preview}</p>
+          </div>
+          <ul class="ep-list">
+            {(c.body ?? []).map(item => (
+              <li class="ep-item">
+                <span class="ep-bullet">—</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+    </div><!-- /intro-panel -->
+
   </section>
 
   <!-- ── Explore ─────────────────────────────────── -->
@@ -191,70 +247,6 @@ const cards = [
 
   </div><!-- /about-layout -->
 
-  <!-- ── Expansion panel (full-width, below layout) ── -->
-  <div class="explore-panel" id="explore-panel">
-
-    <!-- back bar -->
-    <div id="panel-back-bar">
-      <button id="panel-back-btn" type="button">
-        <i class="fa-solid fa-chevron-left"></i>
-        <span>something else</span>
-      </button>
-      <span id="panel-breadcrumb">
-        <span id="panel-crumb-tag">origin story</span>
-        <span class="crumb-sep">·</span>
-        <span id="panel-crumb-title">how i got here</span>
-      </span>
-    </div>
-
-    <!-- journey panel (timeline) -->
-    <div class="ep-content" data-panel="journey">
-      <div class="ep-header">
-        <span class="ep-tag">origin story</span>
-        <h3 class="ep-title">how i got here</h3>
-        <p class="ep-desc">in chronological order, because i respect your time</p>
-      </div>
-      <div class="tl-list">
-        {timeline.map((entry, i) => (
-          <div class="tl-row" data-tl-index={i}>
-            <div class="tl-left-col">
-              <span class="tl-year">{entry.year}</span>
-              <div class="tl-vline"></div>
-            </div>
-            <div class="tl-card">
-              <h4 class="tl-title">{entry.title}</h4>
-              <p class="tl-place">{entry.place}</p>
-              <p class="tl-desc">{entry.desc}</p>
-              <div class="tl-tags">
-                {entry.tags.map(t => <span class="tl-tag">{t}</span>)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <!-- all other panels -->
-    {cards.filter(c => c.id !== "journey").map((c) => (
-      <div class="ep-content" data-panel={c.id} style="display:none">
-        <div class="ep-header">
-          <span class="ep-tag">{c.tag}</span>
-          <h3 class="ep-title">{c.title}</h3>
-          <p class="ep-desc">{c.preview}</p>
-        </div>
-        <ul class="ep-list">
-          {(c.body ?? []).map(item => (
-            <li class="ep-item">
-              <span class="ep-bullet">—</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
-
-  </div><!-- /explore-panel -->
-
 </BaseLayout>
 
 <style>
@@ -270,10 +262,19 @@ const cards = [
 
   /* ── Intro section ───────────────────────────── */
   #about-intro {
+    /* base: just a container; children handle layout */
+  }
+
+  #intro-default {
     min-height: calc(100vh - var(--nav-height));
     display: flex;
     align-items: center;
     padding: 5rem 8%;
+  }
+
+  /* panel view: hidden until card selected */
+  #intro-panel {
+    display: none;
   }
 
   .intro-inner {
@@ -468,66 +469,33 @@ const cards = [
   }
 
 
-  /* ── Dynamic panel ───────────────────────────── */
-  .explore-panel {
-    border: 1px solid var(--border);
-    border-top: 1px solid var(--border-hover);
-    background: var(--surface);
-    min-height: 320px;
+  /* ── Intro panel (left-column card content) ─── */
+  #intro-panel {
+    flex-direction: column;
   }
 
-  /* back bar */
-  #panel-back-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.6rem 2.5rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    position: sticky;
-    top: var(--nav-height);
-    z-index: 10;
+  /* ── Custom scrollbar for left column ───────── */
+  #about-intro {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 109, 206, 0.25) transparent;
   }
 
-  #panel-back-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: "Montserrat", sans-serif;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    cursor: none;
-    padding: 0;
-    transition: color var(--transition);
+  #about-intro::-webkit-scrollbar {
+    width: 3px;
   }
 
-  #panel-back-btn:hover { color: var(--accent); }
-
-  #panel-back-btn i {
-    font-size: 9px;
-    transition: transform var(--transition);
+  #about-intro::-webkit-scrollbar-track {
+    background: transparent;
   }
 
-  #panel-back-btn:hover i { transform: translateX(-3px); }
-
-  #panel-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  #about-intro::-webkit-scrollbar-thumb {
+    background: rgba(155, 109, 206, 0.25);
+    border-radius: 2px;
   }
 
-  #panel-crumb-tag   { color: var(--accent); }
-  .crumb-sep         { color: var(--muted); opacity: 0.4; }
-  #panel-crumb-title { color: var(--muted); }
+  #about-intro::-webkit-scrollbar-thumb:hover {
+    background: rgba(155, 109, 206, 0.55);
+  }
 
   .ep-content {
     padding: 2.5rem;
@@ -744,18 +712,34 @@ const cards = [
       align-items: start;
     }
 
-    /* left col: intro stays sticky while right scrolls */
+    /* left col: fixed height, scrollable when panel content is long */
     #about-intro {
-      padding: 5rem 3rem 5rem 8%;
-      min-height: unset;
+      overflow-y: auto;
       height: calc(100vh - var(--nav-height));
+      min-height: unset;
       position: sticky;
       top: var(--nav-height);
     }
 
+    /* default view fills the column height and centres content */
+    #intro-default {
+      height: 100%;
+      min-height: unset;
+      padding: 5rem 3rem 5rem 8%;
+    }
+
     .intro-inner { max-width: 100%; }
 
-    /* right col: explore, vertically centered */
+    /* panel view: fills column */
+    #intro-panel {
+      min-height: 100%;
+    }
+
+    .ep-content {
+      padding: 2.5rem 3rem 2.5rem 8%;
+    }
+
+    /* right col: orbit, vertically centred */
     #about-explore {
       padding: 2rem 8% 2rem 3.5rem;
       border-left: 1px solid var(--border);
@@ -770,7 +754,7 @@ const cards = [
 
   /* ── Mobile ──────────────────────────────────── */
   @media (max-width: 700px) {
-    #about-intro   { padding: 4rem 6%; }
+    #intro-default { padding: 4rem 6%; min-height: unset; }
     #about-explore { padding: 4rem 6% 2rem; }
     /* #about-nav  { display: none; } */
     .explore-cards { position: static; min-height: unset; display: flex; flex-direction: column; gap: 0.75rem; }
@@ -778,9 +762,6 @@ const cards = [
     .ec-card       { opacity: 1; transform: none !important; }
     .ep-content    { padding: 1.5rem; }
     .tl-left-col   { width: 38px; }
-    #panel-back-bar { padding: 0.6rem 1.5rem; }
-    #panel-crumb-title { display: none; }
-    .crumb-sep { display: none; }
   }
 </style>
 
@@ -860,10 +841,11 @@ const cards = [
 
   /* ── Explore section ─────────────────────────── */
   function initExplore() {
-    const ecCards   = Array.from(document.querySelectorAll<HTMLElement>(".ec-card"));
-    const ecWraps   = Array.from(document.querySelectorAll<HTMLElement>(".ec-card-wrap"));
-    const panelWrap = document.getElementById("explore-panel");
-    if (!ecCards.length || !panelWrap) return;
+    const ecCards     = Array.from(document.querySelectorAll<HTMLElement>(".ec-card"));
+    const ecWraps     = Array.from(document.querySelectorAll<HTMLElement>(".ec-card-wrap"));
+    const introDefault = document.getElementById("intro-default")!;
+    const introPanel   = document.getElementById("intro-panel")!;
+    if (!ecCards.length || !introPanel) return;
 
     /* ── Constants ──────────────────────────────── */
     const N      = ecWraps.length;      // 7
@@ -913,55 +895,49 @@ const cards = [
     }
     gsap.ticker.add(orbitTick);
 
-    /* ── Breadcrumb helper (used by both paths) ──── */
-    const crumbTag   = document.getElementById("panel-crumb-tag");
-    const crumbTitle = document.getElementById("panel-crumb-title");
-    function updateBreadcrumb(i: number) {
-      if (crumbTag)   crumbTag.textContent   = ecCards[i].querySelector(".ec-tag")?.textContent   ?? "";
-      if (crumbTitle) crumbTitle.textContent = ecCards[i].querySelector(".ec-title")?.textContent ?? "";
-    }
-
-    function scrollToPanel() {
-      const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height") || "72");
-      gsap.to(window, { scrollTo: { y: panelWrap, offsetY: navH + 12 }, duration: 0.85, ease: "power3.inOut" });
-    }
-
     /* ── Mobile: simple reveal + click, skip orbit ─ */
     if (window.matchMedia("(max-width: 700px)").matches) {
-      gsap.set(panelWrap, { opacity: 0, y: 20 });
-      panelWrap.style.pointerEvents = "none";
+      introPanel.style.display = "none";
       let mobPanelOpen = false, mobActiveId = "";
       ScrollTrigger.create({
         trigger: "#explore-cards", start: "top 85%", once: true,
         onEnter: () => gsap.to(ecCards, { opacity: 1, duration: 0.5, stagger: 0.08, ease: "power3.out" }),
       });
+
+      function mobClosePanel() {
+        gsap.to(introPanel, { opacity: 0, duration: 0.2, ease: "power2.in", onComplete: () => {
+          introPanel.style.display = "none";
+          introDefault.style.display = "";
+          gsap.fromTo(introDefault, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power3.out" });
+          ecCards.forEach(c => c.classList.remove("active"));
+          mobPanelOpen = false; mobActiveId = "";
+        }});
+      }
+
       ecCards.forEach((card, i) => {
         card.addEventListener("click", () => {
           const id = card.dataset.card; if (!id) return;
+          // tap active card again → close panel
+          if (mobPanelOpen && id === mobActiveId) { mobClosePanel(); return; }
           ecCards.forEach(c => c.classList.toggle("active", c === card));
-          updateBreadcrumb(i);
           if (!mobPanelOpen) {
-            panelWrap.querySelectorAll<HTMLElement>(".ep-content").forEach(el => (el.style.display = "none"));
-            const first = panelWrap.querySelector<HTMLElement>(`[data-panel="${id}"]`);
+            introPanel.querySelectorAll<HTMLElement>(".ep-content").forEach(el => (el.style.display = "none"));
+            const first = introPanel.querySelector<HTMLElement>(`[data-panel="${id}"]`);
             if (first) first.style.display = "block";
-            panelWrap.style.pointerEvents = "auto";
-            gsap.to(panelWrap, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
+            introDefault.style.display = "none";
+            introPanel.style.display = "flex";
+            gsap.fromTo(introPanel, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power3.out" });
             mobPanelOpen = true; mobActiveId = id;
-          } else if (id !== mobActiveId) {
-            const cur = panelWrap.querySelector<HTMLElement>(`[data-panel="${mobActiveId}"]`);
-            const nxt = panelWrap.querySelector<HTMLElement>(`[data-panel="${id}"]`);
+          } else {
+            const cur = introPanel.querySelector<HTMLElement>(`[data-panel="${mobActiveId}"]`);
+            const nxt = introPanel.querySelector<HTMLElement>(`[data-panel="${id}"]`);
             if (cur && nxt) {
               gsap.to(cur, { opacity: 0, duration: 0.15, onComplete: () => { cur.style.display = "none"; nxt.style.display = "block"; gsap.to(nxt, { opacity: 1, duration: 0.3 }); } });
             }
             mobActiveId = id;
           }
-          scrollToPanel();
+          gsap.to(window, { scrollTo: { y: 0 }, duration: 0.6, ease: "power3.inOut" });
         });
-      });
-      document.getElementById("panel-back-btn")?.addEventListener("click", () => {
-        const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height") || "72");
-        const cardsEl = document.getElementById("explore-cards");
-        if (cardsEl) gsap.to(window, { scrollTo: { y: cardsEl, offsetY: navH + 32 }, duration: 0.85, ease: "power3.inOut" });
       });
       return;
     }
@@ -972,8 +948,7 @@ const cards = [
       gsap.set(wrap, { x, y });
       gsap.set(ecCards[i], { opacity: 0, rotation: ROTATIONS[i] });
     });
-    gsap.set(panelWrap, { opacity: 0, y: 20 });
-    panelWrap.style.pointerEvents = "none";
+    introPanel.style.display = "none";
 
     // Fade cards in — orbit ticker already running
     gsap.to(ecCards, {
@@ -999,40 +974,55 @@ const cards = [
     let activeId  = "";
 
     function animateTimelineIn() {
-      gsap.fromTo(panelWrap.querySelectorAll<HTMLElement>(".tl-row"),
+      gsap.fromTo(introPanel.querySelectorAll<HTMLElement>(".tl-row"),
         { opacity: 0, x: -18 },
         { opacity: 1, x: 0, duration: 0.45, stagger: 0.07, ease: "power3.out", delay: 0.1 }
       );
     }
     function animateListIn() {
-      gsap.fromTo(panelWrap.querySelectorAll<HTMLElement>(".ep-item"),
+      gsap.fromTo(introPanel.querySelectorAll<HTMLElement>(".ep-item"),
         { opacity: 0, x: -14 },
         { opacity: 1, x: 0, duration: 0.4, stagger: 0.08, ease: "power3.out", delay: 0.1 }
       );
     }
 
     function openPanel(cardId: string) {
-      const next = panelWrap.querySelector<HTMLElement>(`[data-panel="${cardId}"]`);
+      const next = introPanel.querySelector<HTMLElement>(`[data-panel="${cardId}"]`);
       if (!next) return;
 
       if (!panelOpen) {
-        panelWrap.querySelectorAll<HTMLElement>(".ep-content").forEach(el => (el.style.display = "none"));
+        introPanel.querySelectorAll<HTMLElement>(".ep-content").forEach(el => (el.style.display = "none"));
         next.style.display = "block";
-        panelWrap.style.pointerEvents = "auto";
-        gsap.to(panelWrap, {
-          opacity: 1, y: 0, duration: 0.5, ease: "power3.out",
-          onComplete: () => { if (cardId === "journey") animateTimelineIn(); else animateListIn(); },
+        // pre-hide panel and its animated children BEFORE it becomes visible
+        gsap.set(introPanel, { opacity: 0 });
+        if (cardId === "journey") {
+          gsap.set(introPanel.querySelectorAll(".tl-row"), { opacity: 0, x: -18 });
+        } else {
+          gsap.set(introPanel.querySelectorAll(".ep-item"), { opacity: 0, x: -14 });
+        }
+        // swap intro default → panel view
+        gsap.to(introDefault, { opacity: 0, duration: 0.2, ease: "power2.in",
+          onComplete: () => {
+            introDefault.style.display = "none";
+            introPanel.style.display = "flex";
+            document.getElementById("about-intro")?.scrollTo({ top: 0, behavior: "instant" });
+            gsap.to(introPanel, {
+              opacity: 1, duration: 0.35, ease: "power3.out",
+              onComplete: () => { if (cardId === "journey") animateTimelineIn(); else animateListIn(); },
+            });
+          },
         });
         panelOpen = true;
         activeId  = cardId;
-        scrollToPanel();
         return;
       }
 
-      if (cardId === activeId) { scrollToPanel(); return; }
+      if (cardId === activeId) return;
 
-      const current = panelWrap.querySelector<HTMLElement>(`[data-panel="${activeId}"]`);
+      const current = introPanel.querySelector<HTMLElement>(`[data-panel="${activeId}"]`);
       activeId = cardId;
+      // scroll left column to top when switching panels
+      document.getElementById("about-intro")?.scrollTo({ top: 0, behavior: "smooth" });
       if (current) {
         gsap.to(current, {
           opacity: 0, y: -10, duration: 0.2, ease: "power2.in",
@@ -1046,7 +1036,6 @@ const cards = [
           },
         });
       }
-      scrollToPanel();
     }
 
     /* ── Center-swap logic ──────────────────────── */
@@ -1079,7 +1068,6 @@ const cards = [
       /* re-space remaining cards evenly */
       redistributeOrbit(0.55);
 
-      updateBreadcrumb(clickedIdx);
       const cardId = ecCards[clickedIdx].dataset.card;
       if (cardId) openPanel(cardId);
     }
@@ -1102,8 +1090,13 @@ const cards = [
       gsap.to("#ec-center-hint", { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out", delay: 0.25 });
 
       if (panelOpen) {
-        gsap.to(panelWrap, { opacity: 0, y: 20, duration: 0.4, ease: "power2.in" });
-        panelWrap.style.pointerEvents = "none";
+        gsap.to(introPanel, { opacity: 0, duration: 0.25, ease: "power2.in",
+          onComplete: () => {
+            introPanel.style.display = "none";
+            introDefault.style.display = "";
+            gsap.fromTo(introDefault, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power3.out" });
+          },
+        });
         panelOpen = false;
         activeId = "";
       }
@@ -1115,13 +1108,6 @@ const cards = [
       resetToOrbit();
     });
 
-    /* ── Back button ────────────────────────────── */
-    document.getElementById("panel-back-btn")?.addEventListener("click", () => {
-      const cardsEl = document.getElementById("explore-cards");
-      if (!cardsEl) return;
-      const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height") || "72");
-      gsap.to(window, { scrollTo: { y: cardsEl, offsetY: navH + 32 }, duration: 0.85, ease: "power3.inOut" });
-    });
   }
 
   /* ── Section Nav (removed — kept for reference) ─────────────────────

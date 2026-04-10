@@ -6,9 +6,10 @@ import { ClientRouter } from "astro:transitions";
 interface Props {
   title: string;
   description?: string;
+  hideFooter?: boolean;
 }
 
-const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast and developer." } = Astro.props;
+const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast and developer.", hideFooter = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -55,6 +56,7 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
       <slot />
     </main>
 
+    {!hideFooter && (
     <footer id="site-footer">
       <div class="footer-inner">
         <span class="footer-name">Gosvindraj</span>
@@ -68,6 +70,7 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
         </div>
       </div>
     </footer>
+    )}
 
     <script>
       import gsap from "gsap";
