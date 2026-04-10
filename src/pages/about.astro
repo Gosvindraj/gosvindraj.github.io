@@ -871,59 +871,47 @@ const cards = [
     const HALF_W = 73;                  // half of 145px card width
     const HALF_H = 30;                  // approx half card height
     const ROTATIONS = [-2.5, 1.8, -1.2, 2.8, -2, 1.5, -3];
-    const FLOAT_DUR = [3.2, 2.8, 3.5, 2.6, 3.8, 3.0, 2.9];
-    const SWAY_AMP  = [3.5, 3, 4, 2.5, 3.5, 3, 4];   // ±deg around each card's base rotation
-    const SWAY_DUR  = [5.5, 4.8, 6.2, 5.0, 6.8, 5.3, 4.5];
 
-    function calcOrbit(count: number) {
-      return Array.from({ length: count }, (_, i) => {
-        const rad = ((-90 + i * (360 / count)) * Math.PI) / 180;
-        return { x: RX * Math.cos(rad) - HALF_W, y: RY * Math.sin(rad) - HALF_H };
-      });
-    }
-
-    const ORBIT_7 = calcOrbit(7);
-    const ORBIT_6 = calcOrbit(6);
     const CENTER  = { x: -HALF_W, y: -HALF_H };
 
-    /* ── Float helpers ──────────────────────────── */
-    const floatTweens:  any[] = new Array(N).fill(null);
-    const swayTweens:   any[] = new Array(N).fill(null);
-    const baseY = ORBIT_7.map(p => p.y);  // current assigned orbit y per card
+    /* ── Continuous orbit ticker ────────────────── */
+    let orbitDeg     = -90;                      // leading angle in degrees (starts at top)
+    const DEG_PER_MS = 360 / (30 * 1000);        // one full revolution per 30 s
+    let lastTick     = performance.now();
+    const returningSet = new Set<number>();       // cards mid-transition, skip ticker
+    let orbitingCards  = Array.from({ length: N }, (_, i) => i); // indices of orbiting cards
 
-    function startFloat(i: number) {
-      if (floatTweens[i]) floatTweens[i].kill();
-      if (swayTweens[i])  swayTweens[i].kill();
-      gsap.set(ecWraps[i], { y: baseY[i] });
-      // vertical drift on the wrapper
-      floatTweens[i] = gsap.to(ecWraps[i], {
-        y: baseY[i] + 8,
-        duration: FLOAT_DUR[i],
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-        delay: (i * 0.43) % FLOAT_DUR[i],
+    function slotPos(slotIdx: number, total: number, deg: number) {
+      const rad = ((deg + (slotIdx / total) * 360) * Math.PI) / 180;
+      return { x: RX * Math.cos(rad) - HALF_W, y: RY * Math.sin(rad) - HALF_H };
+    }
+
+    // Smoothly redistribute orbiting cards to their new evenly-spaced slots
+    function redistributeOrbit(dur = 0.55) {
+      const n = orbitingCards.length;
+      const ahead = orbitDeg + DEG_PER_MS * dur * 1000; // anticipate where orbit will be
+      orbitingCards.forEach((cardIdx, slotIdx) => {
+        returningSet.add(cardIdx);
+        const { x, y } = slotPos(slotIdx, n, ahead);
+        gsap.to(ecWraps[cardIdx], {
+          x, y, duration: dur, ease: "power3.inOut",
+          onComplete: () => returningSet.delete(cardIdx),
+        });
       });
-      // rotation rock: oscillates ±SWAY_AMP around the card's base slant angle
-      const lo = ROTATIONS[i] - SWAY_AMP[i];
-      const hi = ROTATIONS[i] + SWAY_AMP[i];
-      swayTweens[i] = gsap.fromTo(ecCards[i],
-        { rotation: lo },
-        {
-          rotation: hi,
-          duration: SWAY_DUR[i],
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-          delay: (i * 0.67) % SWAY_DUR[i],
-        }
-      );
     }
 
-    function stopFloat(i: number) {
-      if (floatTweens[i]) { floatTweens[i].kill(); floatTweens[i] = null; }
-      if (swayTweens[i])  { swayTweens[i].kill();  swayTweens[i]  = null; }
+    function orbitTick() {
+      const now = performance.now();
+      orbitDeg += DEG_PER_MS * (now - lastTick);
+      lastTick = now;
+      const n = orbitingCards.length;
+      orbitingCards.forEach((cardIdx, slotIdx) => {
+        if (returningSet.has(cardIdx)) return;
+        const { x, y } = slotPos(slotIdx, n, orbitDeg);
+        gsap.set(ecWraps[cardIdx], { x, y });
+      });
     }
+    gsap.ticker.add(orbitTick);
 
     /* ── Breadcrumb helper (used by both paths) ──── */
     const crumbTag   = document.getElementById("panel-crumb-tag");
@@ -979,36 +967,30 @@ const cards = [
     }
 
     /* ── Desktop: orbit placement ───────────────── */
-    ORBIT_7.forEach((pos, i) => {
-      gsap.set(ecWraps[i], { x: pos.x, y: pos.y });
+    ecWraps.forEach((wrap, i) => {
+      const { x, y } = slotPos(i, N, orbitDeg);
+      gsap.set(wrap, { x, y });
       gsap.set(ecCards[i], { opacity: 0, rotation: ROTATIONS[i] });
     });
     gsap.set(panelWrap, { opacity: 0, y: 20 });
     panelWrap.style.pointerEvents = "none";
 
-    // Orbit cards are always in the viewport — animate directly
+    // Fade cards in — orbit ticker already running
     gsap.to(ecCards, {
       opacity: 1, duration: 0.5, delay: 0.3,
       stagger: { amount: 0.45, from: "start" },
       ease: "power3.out",
-      onComplete: () => ecWraps.forEach((_, i) => startFloat(i)),
     });
 
-    /* ── Hover ──────────────────────────────────── */
+    /* ── Hover: scale up while orbiting ────────── */
     ecCards.forEach((card, i) => {
       card.addEventListener("mouseenter", () => {
         if (i === centerIdx) return;
-        stopFloat(i);
-        gsap.to(ecWraps[i], { y: baseY[i] - 6, duration: 0.25, ease: "power2.out" });
-        gsap.to(card, { rotation: 0, duration: 0.25, ease: "power2.out" });
+        gsap.to(card, { scale: 1.1, duration: 0.15, ease: "power3.out" });
       });
       card.addEventListener("mouseleave", () => {
         if (i === centerIdx) return;
-        gsap.to(ecWraps[i], {
-          y: baseY[i], duration: 0.5, ease: "elastic.out(1, 0.6)",
-          onComplete: () => startFloat(i),
-        });
-        gsap.to(card, { rotation: ROTATIONS[i], duration: 0.5, ease: "elastic.out(1, 0.6)" });
+        gsap.to(card, { scale: 1, duration: 0.2, ease: "power3.in" });
       });
     });
 
@@ -1071,44 +1053,32 @@ const cards = [
     let centerIdx = -1;
 
     function selectCard(clickedIdx: number) {
-      if (clickedIdx === centerIdx) { resetToOrbit7(); return; }
+      if (clickedIdx === centerIdx) { resetToOrbit(); return; }
 
       const prevCenter = centerIdx;
       centerIdx = clickedIdx;
 
-      /* active class */
       ecCards.forEach((c, i) => c.classList.toggle("active", i === clickedIdx));
-
-      /* hide centre hint */
       gsap.to("#ec-center-hint", { opacity: 0, scale: 0.8, duration: 0.3, ease: "power2.in" });
 
-      /* clicked card → center */
-      stopFloat(clickedIdx);
-      gsap.to(ecWraps[clickedIdx], { x: CENTER.x, y: CENTER.y, duration: 0.65, ease: "power3.inOut" });
-      gsap.to(ecCards[clickedIdx], { rotation: 0, scale: 1.1, duration: 0.65, ease: "power3.inOut" });
-
-      /* redistribute remaining 6 into ORBIT_6 */
-      const remaining = Array.from({ length: N }, (_, i) => i).filter(i => i !== clickedIdx);
-      remaining.forEach((cardIdx, j) => {
-        const pos = ORBIT_6[j];
-        stopFloat(cardIdx);
-        baseY[cardIdx] = pos.y;
-
-        gsap.to(ecWraps[cardIdx], {
-          x: pos.x, y: pos.y, duration: 0.65, ease: "power3.inOut", delay: 0.02 * j,
-          onComplete: () => startFloat(cardIdx),
-        });
-
-        if (cardIdx === prevCenter) {
-          /* returning card: reset scale */
-          gsap.to(ecCards[cardIdx], {
-            rotation: ROTATIONS[cardIdx], scale: 1,
-            duration: 0.65, ease: "power3.inOut", delay: 0.02 * j,
-          });
-        }
+      /* pull selected card to center */
+      returningSet.add(clickedIdx);
+      gsap.to(ecWraps[clickedIdx], {
+        x: CENTER.x, y: CENTER.y, duration: 0.55, ease: "power3.inOut",
+        onComplete: () => returningSet.delete(clickedIdx),
       });
+      gsap.to(ecCards[clickedIdx], { rotation: 0, scale: 1.1, duration: 0.55, ease: "power3.inOut" });
 
-      /* open/switch panel */
+      /* rebuild orbiting list: remove clicked, re-add previous center if any */
+      orbitingCards = orbitingCards.filter(idx => idx !== clickedIdx);
+      if (prevCenter !== -1 && !orbitingCards.includes(prevCenter)) {
+        orbitingCards.push(prevCenter);
+        gsap.to(ecCards[prevCenter], { rotation: ROTATIONS[prevCenter], scale: 1, duration: 0.55, ease: "power3.inOut" });
+      }
+
+      /* re-space remaining cards evenly */
+      redistributeOrbit(0.55);
+
       updateBreadcrumb(clickedIdx);
       const cardId = ecCards[clickedIdx].dataset.card;
       if (cardId) openPanel(cardId);
@@ -1116,28 +1086,19 @@ const cards = [
 
     ecCards.forEach((card, i) => card.addEventListener("click", () => selectCard(i)));
 
-    /* ── Reset to full 7-orbit on background click ─ */
-    function resetToOrbit7() {
+    /* ── Reset: return center card to orbit ─────── */
+    function resetToOrbit() {
       if (centerIdx === -1) return;
-      const prevCenter = centerIdx;
+      const prev = centerIdx;
       centerIdx = -1;
 
       ecCards.forEach(c => c.classList.remove("active"));
+      gsap.to(ecCards[prev], { rotation: ROTATIONS[prev], scale: 1, duration: 0.55, ease: "power3.inOut" });
 
-      ecCards.forEach((card, i) => {
-        stopFloat(i);
-        baseY[i] = ORBIT_7[i].y;
-        gsap.to(ecWraps[i], {
-          x: ORBIT_7[i].x, y: ORBIT_7[i].y,
-          duration: 0.6, ease: "power3.inOut", delay: 0.015 * i,
-          onComplete: () => startFloat(i),
-        });
-        if (i === prevCenter) {
-          gsap.to(card, { rotation: ROTATIONS[i], scale: 1, duration: 0.6, ease: "power3.inOut" });
-        }
-      });
+      /* add back and re-space all 7 evenly */
+      if (!orbitingCards.includes(prev)) orbitingCards.push(prev);
+      redistributeOrbit(0.55);
 
-      /* restore centre hint */
       gsap.to("#ec-center-hint", { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out", delay: 0.25 });
 
       if (panelOpen) {
@@ -1151,7 +1112,7 @@ const cards = [
     document.getElementById("about-explore")?.addEventListener("click", (e) => {
       if (centerIdx === -1) return;
       if ((e.target as HTMLElement).closest(".ec-card")) return;
-      resetToOrbit7();
+      resetToOrbit();
     });
 
     /* ── Back button ────────────────────────────── */
