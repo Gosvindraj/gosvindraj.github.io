@@ -29,28 +29,48 @@ export default function ChatBot() {
   const [loading, setLoading]    = useState(false);
   const [error, setError]        = useState("");
   const [sessionCount, setCount] = useState(0);
-  // FIX 1: hide on found-me landing screen
   const [visible, setVisible]    = useState(false);
-  // FIX 3: mobile-aware sizing
   const [isMobile, setIsMobile]  = useState(false);
 
   const lastSend  = useRef(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLTextAreaElement>(null);
 
-  // FIX 1 — hide while found-me screen is covering the page
+  // ── FIX 1 & 3: visibility logic ────────────────────────────────────────
   useEffect(() => {
     function updateVisibility() {
       const foundMe = document.querySelector<HTMLElement>("#found-me-screen");
+
       if (!foundMe) {
+        // Not on the home page — always show immediately
         setVisible(true);
         return;
       }
-      // On home page: hide until the user clicks "enter"
-      setVisible(false);
-      document
-        .querySelector("#found-me-btn")
-        ?.addEventListener("click", () => setVisible(true), { once: true });
+
+      // FIX 3: defer so initHero() (also an astro:page-load listener) runs first.
+      // When foundMeSeen=true, initHero() sets display:"none" synchronously —
+      // by the time setTimeout(0) fires, that has already happened.
+      setTimeout(() => {
+        const hidden = window.getComputedStyle(foundMe).display === "none";
+        if (hidden) {
+          // User has already dismissed the found-me screen this session
+          setVisible(true);
+        } else {
+          // First visit — hide until the user clicks "enter"
+          setVisible(false);
+          document
+            .querySelector("#found-me-btn")
+            ?.addEventListener(
+              "click",
+              () => {
+                // FIX 2: delay appearance so it doesn't clash with the
+                // found-me exit animation (chars scatter ~0.8s)
+                setTimeout(() => setVisible(true), 1100);
+              },
+              { once: true }
+            );
+        }
+      }, 0);
     }
 
     updateVisibility();
@@ -58,7 +78,7 @@ export default function ChatBot() {
     return () => document.removeEventListener("astro:page-load", updateVisibility);
   }, []);
 
-  // FIX 3 — track whether we're on a narrow viewport
+  // Mobile breakpoint
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 520);
     check();
@@ -112,7 +132,6 @@ export default function ChatBot() {
     setLoading(true);
     lastSend.current = now;
 
-    // Reset textarea height
     if (inputRef.current) inputRef.current.style.height = "auto";
 
     try {
@@ -160,7 +179,6 @@ export default function ChatBot() {
   const canSend     = !loading && !isExhausted && input.trim().length > 0;
   const remaining   = MAX_SESSION - sessionCount;
 
-  // FIX 3 — responsive panel dimensions
   const panelRight  = isMobile ? "16px" : "24px";
   const panelWidth  = isMobile ? "calc(100vw - 32px)" : "340px";
   const panelHeight = isMobile ? "min(70vh, 520px)" : "480px";
@@ -227,28 +245,31 @@ export default function ChatBot() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span style={{ fontSize: "10px", color: T.muted, letterSpacing: "0.04em" }}>
               {remaining} / {MAX_SESSION}
             </span>
+
+            {/* FIX 1 — bigger, more prominent close button */}
             <button
               onClick={() => setOpen(false)}
               aria-label="Close chat"
+              className="chatbot-close-btn"
               style={{
-                background: "none",
-                border:     "none",
-                color:      T.muted,
-                lineHeight: 1,
-                padding:    "4px",
-                display:    "flex",
-                alignItems: "center",
-                // FIX 3: bigger tap target on mobile
-                minWidth:   isMobile ? "32px" : "auto",
-                minHeight:  isMobile ? "32px" : "auto",
+                background:     "rgba(255,255,255,0.05)",
+                border:         `1px solid ${T.border}`,
+                borderRadius:   "6px",
+                width:          "30px",
+                height:         "30px",
+                display:        "flex",
+                alignItems:     "center",
                 justifyContent: "center",
+                color:          T.muted,
+                flexShrink:     0,
+                transition:     "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
@@ -319,7 +340,6 @@ export default function ChatBot() {
             </div>
           ))}
 
-          {/* Typing indicator */}
           {loading && (
             <div style={{ display: "flex", justifyContent: "flex-start" }}>
               <div style={{
@@ -370,7 +390,6 @@ export default function ChatBot() {
           flexShrink: 0,
           background: T.surface,
         }}>
-          {/* FIX 2: scrollbar hidden via className */}
           <textarea
             ref={inputRef}
             className="chatbot-input"
@@ -382,22 +401,22 @@ export default function ChatBot() {
             rows={1}
             maxLength={MAX_CHARS}
             style={{
-              flex:        1,
-              background:  T.bg,
-              border:      `1px solid ${T.border}`,
-              borderRadius:"6px",
-              color:       T.text,
-              fontSize:    "13px",
-              padding:     "9px 12px",
-              resize:      "none",
-              fontFamily:  "'Montserrat', sans-serif",
-              lineHeight:  1.5,
-              outline:     "none",
-              opacity:     isExhausted ? 0.45 : 1,
-              maxHeight:   "100px",
-              overflowY:   "auto",
+              flex:           1,
+              background:     T.bg,
+              border:         `1px solid ${T.border}`,
+              borderRadius:   "6px",
+              color:          T.text,
+              fontSize:       "13px",
+              padding:        "9px 12px",
+              resize:         "none",
+              fontFamily:     "'Montserrat', sans-serif",
+              lineHeight:     1.5,
+              outline:        "none",
+              opacity:        isExhausted ? 0.45 : 1,
+              maxHeight:      "100px",
+              overflowY:      "auto",
               scrollbarWidth: "none",
-              transition:  "border-color 0.2s ease",
+              transition:     "border-color 0.2s ease",
             }}
             onFocus={e => { e.currentTarget.style.borderColor = T.borderHover; }}
             onBlur={e  => { e.currentTarget.style.borderColor = T.border; }}
@@ -429,7 +448,7 @@ export default function ChatBot() {
         </div>
       </div>
 
-      {/* FIX 4 — subtle pulse ring behind FAB (separate element, no style conflict) */}
+      {/* Pulse ring — sits behind FAB, hidden when open */}
       {!open && visible && (
         <span
           aria-hidden
@@ -467,9 +486,9 @@ export default function ChatBot() {
           boxShadow:      open
             ? `0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px ${T.borderHover}`
             : "0 4px 20px rgba(155,109,206,0.4)",
-          transition:     "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease",
+          // FIX 2: slow fade-in (1s) so it doesn't snap in abruptly
+          transition:     "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, opacity 1s ease",
           color:          open ? T.accent : "#fff",
-          // FIX 1: fade in/out based on visibility
           opacity:        visible ? 1 : 0,
           pointerEvents:  visible ? "auto" : "none",
         }}
@@ -487,18 +506,23 @@ export default function ChatBot() {
       </button>
 
       <style>{`
-        /* FIX 2 — hide scrollbar inside textarea on webkit */
+        /* Textarea — hide scrollbar (webkit + firefox) */
         .chatbot-input::-webkit-scrollbar { display: none; }
 
-        /* FIX 4 — slow subtle pulse ring */
+        /* FIX 1 — close button hover state */
+        .chatbot-close-btn:hover {
+          background: rgba(155, 109, 206, 0.12) !important;
+          border-color: rgba(155, 109, 206, 0.4) !important;
+          color: #e4e4e8 !important;
+        }
+
+        /* Pulse ring animation */
         @keyframes chatbotPulse {
-          0%   { box-shadow: 0 0 0 0   rgba(155, 109, 206, 0.45); }
-          70%  { box-shadow: 0 0 0 14px rgba(155, 109, 206, 0);   }
-          100% { box-shadow: 0 0 0 0   rgba(155, 109, 206, 0);   }
+          0%   { box-shadow: 0 0 0 0    rgba(155, 109, 206, 0.45); }
+          70%  { box-shadow: 0 0 0 14px rgba(155, 109, 206, 0);    }
+          100% { box-shadow: 0 0 0 0    rgba(155, 109, 206, 0);    }
         }
-        .chatbot-pulse-ring {
-          animation: chatbotPulse 2.8s ease-out infinite;
-        }
+        .chatbot-pulse-ring { animation: chatbotPulse 2.8s ease-out infinite; }
 
         /* Typing dots */
         @keyframes chatbotDot {
