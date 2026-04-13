@@ -278,16 +278,18 @@ export default function ChatBot() {
         </div>
 
         {/* Messages */}
-        <div style={{
-          flex:          1,
-          overflowY:     "auto",
-          padding:       "16px",
-          display:       "flex",
-          flexDirection: "column",
-          gap:           "12px",
-          scrollbarWidth:"thin",
-          scrollbarColor:`rgba(155,109,206,0.2) transparent`,
-        }}>
+        <div
+          className="chatbot-messages"
+          style={{
+            flex:          1,
+            overflowY:     "auto",
+            padding:       "16px",
+            display:       "flex",
+            flexDirection: "column",
+            gap:           "12px",
+            scrollbarWidth:"thin",
+            scrollbarColor:`rgba(155,109,206,0.2) transparent`,
+          }}>
           {messages.length === 0 && (
             <div style={{
               margin:     "auto",
@@ -425,6 +427,7 @@ export default function ChatBot() {
             onClick={send}
             disabled={!canSend}
             aria-label="Send message"
+            className="chatbot-send-btn"
             style={{
               background:     canSend ? T.accent : "rgba(155,109,206,0.2)",
               border:         "none",
@@ -470,6 +473,7 @@ export default function ChatBot() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close chat" : "Open chat"}
+        className="chatbot-fab"
         style={{
           position:       "fixed",
           bottom:         fabBottom,
@@ -508,6 +512,21 @@ export default function ChatBot() {
       <style>{`
         /* Textarea — hide scrollbar (webkit + firefox) */
         .chatbot-input::-webkit-scrollbar { display: none; }
+
+        /* Force custom cursor on all chatbot buttons */
+        .chatbot-messages, .chatbot-input,
+        .chatbot-close-btn, .chatbot-send-btn, .chatbot-fab { cursor: none !important; }
+
+        /* Message list — slim styled scrollbar */
+        .chatbot-messages::-webkit-scrollbar        { width: 4px; }
+        .chatbot-messages::-webkit-scrollbar-track  { background: transparent; }
+        .chatbot-messages::-webkit-scrollbar-thumb  {
+          background: rgba(155, 109, 206, 0.25);
+          border-radius: 2px;
+        }
+        .chatbot-messages::-webkit-scrollbar-thumb:hover {
+          background: rgba(155, 109, 206, 0.45);
+        }
 
         /* FIX 1 — close button hover state */
         .chatbot-close-btn:hover {
