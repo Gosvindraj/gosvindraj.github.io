@@ -121,6 +121,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     cursor: none;
   }
 
+  .field input::selection,
+  .field textarea::selection {
+    background: rgba(155, 109, 206, 0.35);
+    color: #fff;
+  }
+
   .field input::placeholder,
   .field textarea::placeholder {
     color: var(--muted);

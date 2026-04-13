@@ -510,6 +510,13 @@ export default function ChatBot() {
       </button>
 
       <style>{`
+        /* Purple text selection — input field and message bubbles */
+        .chatbot-input::selection,
+        .chatbot-messages *::selection {
+          background: rgba(155, 109, 206, 0.35);
+          color: #fff;
+        }
+
         /* Textarea — hide scrollbar (webkit + firefox) */
         .chatbot-input::-webkit-scrollbar { display: none; }
 
