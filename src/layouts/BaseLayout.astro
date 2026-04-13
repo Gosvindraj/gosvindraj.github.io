@@ -1,5 +1,6 @@
 ---
 import Navbar from "../components/Navbar.astro";
+import ChatBot from "../components/ChatBot";
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 
@@ -71,6 +72,9 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
       </div>
     </footer>
     )}
+
+    <!-- Chatbot island — persists across page navigations -->
+    <ChatBot client:load transition:persist />
 
     <script>
       import gsap from "gsap";
