@@ -678,6 +678,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const btn      = document.getElementById("found-me-btn") as HTMLElement;
     if (!heroName || !btn) return;
 
+    // Lock scroll while the found-me overlay is covering the page
+    document.body.style.overflow = "hidden";
+
     /* ── Character split ─────────────────────── */
     const rawText = heroName.textContent ?? "";
     heroName.innerHTML = rawText
@@ -828,6 +831,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       gsap.timeline({
         onComplete: () => {
           screen.style.display = "none";
+          document.body.style.overflow = "";
           showIntro(true);
         },
       })
