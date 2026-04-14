@@ -1044,6 +1044,12 @@ const cards = [
           opacity: 0, y: -10, duration: 0.2, ease: "power2.in",
           onComplete: () => {
             current.style.display = "none";
+            // pre-hide animated children before the panel becomes visible
+            if (cardId === "journey") {
+              gsap.set(next.querySelectorAll(".tl-row"), { opacity: 0, x: -18 });
+            } else {
+              gsap.set(next.querySelectorAll(".ep-item"), { opacity: 0, x: -14 });
+            }
             next.style.display = "block";
             gsap.fromTo(next, { opacity: 0, y: 12 }, {
               opacity: 1, y: 0, duration: 0.35, ease: "power3.out",
