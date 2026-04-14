@@ -2,6 +2,15 @@
 
 interface Env {
   GROK_API_KEY: string;
+  RATE_LIMIT_KV: KVNamespace;
+}
+
+const RATE_LIMIT_MAX    = 20;   // requests per window
+const RATE_LIMIT_WINDOW = 3600; // seconds (1 hour)
+
+interface RateLimitEntry {
+  count: number;
+  windowStart: number; // unix timestamp ms
 }
 
 interface HistoryMessage {
@@ -75,6 +84,34 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (!allowed) {
     return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: corsHeaders });
   }
+
+  // ── Rate limiting (per IP, 20 req / hour via KV) ─────────────────────────
+  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  const kvKey = `ratelimit:${ip}`;
+  const now = Date.now();
+
+  const raw = await env.RATE_LIMIT_KV.get(kvKey);
+  const entry: RateLimitEntry = raw
+    ? (JSON.parse(raw) as RateLimitEntry)
+    : { count: 0, windowStart: now };
+
+  // Reset window if it has expired
+  if (now - entry.windowStart > RATE_LIMIT_WINDOW * 1000) {
+    entry.count = 0;
+    entry.windowStart = now;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    const retryAfter = Math.ceil((entry.windowStart + RATE_LIMIT_WINDOW * 1000 - now) / 1000);
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please try again later." }),
+      { status: 429, headers: { ...corsHeaders, "Retry-After": String(retryAfter) } }
+    );
+  }
+
+  // Increment and persist; TTL ensures the key auto-expires after one window
+  entry.count += 1;
+  await env.RATE_LIMIT_KV.put(kvKey, JSON.stringify(entry), { expirationTtl: RATE_LIMIT_WINDOW });
 
   // ── Parse & validate body ────────────────────────────────────────────────
   let body: { message?: unknown; history?: unknown };
