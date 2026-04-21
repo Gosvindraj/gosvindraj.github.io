@@ -121,6 +121,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     cursor: none;
   }
 
+  .field input:-webkit-autofill,
+  .field input:-webkit-autofill:hover,
+  .field input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+    -webkit-text-fill-color: var(--text);
+    caret-color: var(--text);
+  }
+
   .field input::selection,
   .field textarea::selection {
     background: rgba(155, 109, 206, 0.35);
