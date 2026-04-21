@@ -2,16 +2,19 @@
 
 interface Env {}
 
-interface GlacierTx {
+interface NativeTx {
   txHash: string;
   blockTimestamp: number;
-  from: { address: string };
+  from?: { address: string };
   to?: { address: string };
   value: string;
   gasUsed: string;
-  gasPrice: string;
   nonce: string;
   txStatus: string;
+}
+
+interface GlacierTx {
+  nativeTransaction: NativeTx;
 }
 
 interface GlacierResponse {
@@ -146,19 +149,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (txs.length === 0)
     return new Response(JSON.stringify({ transactions: [], message: "No transactions found for this address on Avalanche C-Chain." }), { status: 200, headers: corsHeaders });
 
-  // Log first tx so we can inspect the real Glacier schema
-  console.log("Glacier sample tx:", JSON.stringify(txs[0]));
+  txs = txs.filter(tx => !!tx.nativeTransaction?.txHash);
 
-  // Only require a hash — handle all other missing fields with defaults
-  txs = txs.filter(tx => !!tx.txHash);
+  if (txs.length === 0)
+    return new Response(JSON.stringify({ transactions: [], message: "No valid transactions found." }), { status: 200, headers: corsHeaders });
 
   // ── Feature extraction (sort ascending for timeDelta) ─────────────────────
-  const asc = [...txs].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
+  const asc = [...txs].sort((a, b) => a.nativeTransaction.blockTimestamp - b.nativeTransaction.blockTimestamp);
 
   const features = asc.map((tx, i) => {
-    const valueAvax = parseWei(tx.value);
-    const gasUsed   = Number(tx.gasUsed) || 0;
-    const timeDelta = i === 0 ? 0 : asc[i].blockTimestamp - asc[i - 1].blockTimestamp;
+    const ntx       = tx.nativeTransaction;
+    const valueAvax = parseWei(ntx.value ?? "0");
+    const gasUsed   = Number(ntx.gasUsed) || 0;
+    const timeDelta = i === 0 ? 0 : asc[i].nativeTransaction.blockTimestamp - asc[i - 1].nativeTransaction.blockTimestamp;
     return [
       Math.log1p(valueAvax),
       Math.log1p(gasUsed),
@@ -169,16 +172,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const scores = isolationForest(normalize(features), 100);
 
   // ── Build response (most recent first) ───────────────────────────────────
-  const results = asc.map((tx, i) => ({
-    hash:      tx.txHash,
-    timestamp: tx.blockTimestamp,
-    from:      tx.from?.address ?? "",
-    to:        tx.to?.address ?? null,
-    valueAvax: parseWei(tx.value),
-    gasUsed:   Number(tx.gasUsed) || 0,
-    score:     Math.round(scores[i] * 1000) / 1000,
-    flag:      scores[i] > 0.62 ? "anomalous" : scores[i] > 0.52 ? "suspicious" : "normal",
-  })).reverse();
+  const results = asc.map((tx, i) => {
+    const ntx = tx.nativeTransaction;
+    return {
+      hash:      ntx.txHash,
+      timestamp: ntx.blockTimestamp,
+      from:      ntx.from?.address ?? "",
+      to:        ntx.to?.address ?? null,
+      valueAvax: parseWei(ntx.value ?? "0"),
+      gasUsed:   Number(ntx.gasUsed) || 0,
+      score:     Math.round(scores[i] * 1000) / 1000,
+      flag:      scores[i] > 0.62 ? "anomalous" : scores[i] > 0.52 ? "suspicious" : "normal",
+    };
+  }).reverse();
 
   return new Response(JSON.stringify({ transactions: results }), { status: 200, headers: corsHeaders });
 };
