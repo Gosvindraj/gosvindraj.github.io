@@ -59,6 +59,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
                   <th>Gas</th>
                   <th>Score</th>
                   <th>Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="tx-body"></tbody>
@@ -69,6 +70,41 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
     </div>
   </section>
+
+  <!-- ── Modal ── -->
+  <div id="tx-modal" class="modal-backdrop hidden" aria-modal="true" role="dialog">
+    <div class="modal-panel" id="modal-panel">
+      <button class="modal-close" id="modal-close" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-header">
+        <div class="modal-flag-row">
+          <span class="modal-badge" id="modal-badge"></span>
+          <span class="modal-score" id="modal-score"></span>
+        </div>
+        <div class="modal-hash-row">
+          <span class="modal-hash-val" id="modal-hash-display"></span>
+          <div class="modal-hash-actions">
+            <button class="icon-btn" id="modal-copy" title="Copy hash">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+            <a class="icon-btn" id="modal-snowtrace" href="#" target="_blank" rel="noopener" title="View on Snowtrace">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-meta" id="modal-meta"></div>
+
+      <div class="modal-divider"></div>
+
+      <div class="modal-verdict" id="modal-verdict"></div>
+
+      <div class="modal-features" id="modal-features"></div>
+    </div>
+  </div>
 </BaseLayout>
 
 <style>
@@ -205,6 +241,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   #address-input::placeholder { color: var(--muted); font-family: "Montserrat", sans-serif; font-size: 0.8rem; letter-spacing: 0.02em; }
 
+  #address-input::selection {
+    background: rgba(155, 109, 206, 0.35);
+    color: #fff;
+  }
+
   #analyze-btn {
     display: flex;
     align-items: center;
@@ -271,13 +312,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     line-height: 1;
   }
 
-  .stat-val.has-anomalies { color: #eb5757; }
+  .stat-val.has-anomalies  { color: #eb5757; }
   .stat-val.has-suspicious { color: #f2994a; }
 
   /* ── Table ── */
-  .table-wrap {
-    overflow-x: auto;
-  }
+  .table-wrap { overflow-x: auto; }
 
   #tx-table {
     width: 100%;
@@ -297,15 +336,21 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     white-space: nowrap;
   }
 
-  #tx-table td {
-    padding: 0.65rem 0.75rem;
+  #tx-table th:last-child { width: 32px; }
+
+  .tx-row { cursor: none; transition: background var(--transition); }
+
+  .tx-row td {
+    padding: 0.7rem 0.75rem;
     border-bottom: 1px solid var(--border);
     color: var(--muted);
     vertical-align: middle;
     white-space: nowrap;
   }
 
-  #tx-table tr:hover td { background: var(--surface); }
+  .tx-row:hover td { background: var(--surface); }
+
+  .tx-row:hover .row-arrow { opacity: 1; transform: translateX(2px); }
 
   .td-hash a {
     font-family: "Courier New", monospace;
@@ -321,11 +366,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .td-value { font-family: "Courier New", monospace; color: var(--text); }
 
   /* score bar */
-  .score-wrap {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
+  .score-wrap { display: flex; align-items: center; gap: 0.5rem; }
 
   .score-bar-bg {
     width: 60px;
@@ -336,11 +377,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     flex-shrink: 0;
   }
 
-  .score-bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.4s ease;
-  }
+  .score-bar-fill { height: 100%; border-radius: 2px; }
 
   .score-num {
     font-family: "Courier New", monospace;
@@ -362,44 +399,177 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     border-radius: 2px;
   }
 
-  .badge-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-  }
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-  .badge-normal    { background: rgba(111,207,151,0.1); color: #6fcf97; }
-  .badge-normal    .badge-dot { background: #6fcf97; }
-  .badge-suspicious{ background: rgba(242,153,74,0.1);  color: #f2994a; }
+  .badge-normal     { background: rgba(111,207,151,0.1); color: #6fcf97; }
+  .badge-normal     .badge-dot { background: #6fcf97; }
+  .badge-suspicious { background: rgba(242,153,74,0.1);  color: #f2994a; }
   .badge-suspicious .badge-dot { background: #f2994a; }
-  .badge-anomalous { background: rgba(235,87,87,0.1);   color: #eb5757; }
+  .badge-anomalous  { background: rgba(235,87,87,0.1);   color: #eb5757; }
   .badge-anomalous  .badge-dot { background: #eb5757; }
 
-  /* ── Detail row ── */
-  .detail-row td { padding: 0; border-bottom: 1px solid var(--border); }
-
-  .detail-inner {
-    padding: 1rem 0.75rem 1.25rem;
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .detail-verdict {
-    font-size: 0.8rem;
+  /* row arrow hint */
+  .row-arrow {
     color: var(--muted);
-    line-height: 1.8;
-    max-width: 680px;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity var(--transition), transform var(--transition);
   }
 
-  .feature-bars {
+  .hidden { display: none !important; }
+
+  /* ── Modal ── */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-panel {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border-hover);
+    border-radius: 3px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 1.25rem;
   }
 
-  .feature-bar-item {
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .modal-close:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface); }
+
+  /* modal header */
+  .modal-header { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .modal-flag-row { display: flex; align-items: center; gap: 0.75rem; }
+
+  .modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.65rem;
+    border-radius: 2px;
+  }
+
+  .modal-score {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .modal-hash-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .modal-hash-val {
+    font-family: "Courier New", monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    word-break: break-all;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .modal-hash-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+  .icon-btn {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    text-decoration: none;
+  }
+
+  .icon-btn:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface); }
+
+  /* modal meta */
+  .modal-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.5rem;
+  }
+
+  .meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+
+  .meta-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .meta-val {
+    font-family: "Courier New", monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    word-break: break-all;
+  }
+
+  .modal-divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* verdict */
+  .modal-verdict {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  /* feature bars */
+  .modal-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .feature-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -411,7 +581,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--muted);
-    width: 60px;
+    width: 68px;
     flex-shrink: 0;
   }
 
@@ -421,13 +591,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     background: var(--border);
     border-radius: 2px;
     overflow: hidden;
-    max-width: 260px;
   }
 
   .feature-fill {
     height: 100%;
     border-radius: 2px;
-    opacity: 0.75;
+    opacity: 0.8;
   }
 
   .feature-pct {
@@ -436,11 +605,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     color: var(--muted);
     width: 56px;
     flex-shrink: 0;
+    text-align: right;
   }
-
-  .tx-row:hover td { background: var(--surface); }
-
-  .hidden { display: none; }
 
   @media (max-width: 960px) {
     .project-inner { flex-direction: column; gap: 3rem; }
@@ -449,6 +615,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   @media (max-width: 600px) {
     #project-anomaly { padding: 3rem 6%; }
+    .modal-meta { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -475,15 +642,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   function timeAgo(ts: number): string {
     const diff = Math.floor(Date.now() / 1000) - ts;
-    if (diff < 60)   return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400)return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 60)    return `${diff}s ago`;
+    if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
     return `${Math.floor(diff / 86400)}d ago`;
   }
 
+  function fmtDate(ts: number): string {
+    return new Date(ts * 1000).toLocaleString("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    });
+  }
+
   function fmtAvax(v: number): string {
-    if (v === 0) return "0 AVAX";
-    if (v < 0.0001) return "<0.0001 AVAX";
+    if (v === 0)       return "0 AVAX";
+    if (v < 0.0001)    return "<0.0001 AVAX";
     return `${v.toLocaleString("en-US", { maximumFractionDigits: 4 })} AVAX`;
   }
 
@@ -491,6 +665,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     if (flag === "anomalous")  return "#eb5757";
     if (flag === "suspicious") return "#f2994a";
     return "#6fcf97";
+  }
+
+  function truncate(addr: string, head = 8, tail = 6): string {
+    if (!addr) return "—";
+    return `${addr.slice(0, head)}...${addr.slice(-tail)}`;
   }
 
   function explain(tx: TxResult): string {
@@ -532,6 +711,105 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     return lines.join(" ");
   }
 
+  // ── Modal ──────────────────────────────────────────────────────────────────
+
+  let modalOpen = false;
+
+  function openModal(tx: TxResult) {
+    const backdrop   = document.getElementById("tx-modal")!;
+    const panel      = document.getElementById("modal-panel")!;
+    const badge      = document.getElementById("modal-badge")!;
+    const scoreEl    = document.getElementById("modal-score")!;
+    const hashDisp   = document.getElementById("modal-hash-display")!;
+    const copyBtn    = document.getElementById("modal-copy")!;
+    const snowtrace  = document.getElementById("modal-snowtrace") as HTMLAnchorElement;
+    const metaEl     = document.getElementById("modal-meta")!;
+    const verdictEl  = document.getElementById("modal-verdict")!;
+    const featuresEl = document.getElementById("modal-features")!;
+
+    const color = scoreColor(tx.flag);
+
+    // badge
+    badge.className = `modal-badge badge-${tx.flag}`;
+    badge.innerHTML = `<span class="badge-dot"></span>${tx.flag}`;
+
+    // score
+    scoreEl.textContent = `score ${tx.score.toFixed(3)}`;
+
+    // hash
+    hashDisp.textContent = tx.hash;
+    snowtrace.href = `https://snowtrace.io/tx/${tx.hash}`;
+
+    // copy
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(tx.hash).then(() => {
+        const icon = copyBtn.querySelector("i")!;
+        icon.className = "fa-solid fa-check";
+        setTimeout(() => { icon.className = "fa-regular fa-copy"; }, 1500);
+      });
+    };
+
+    // meta grid
+    metaEl.innerHTML = `
+      <div class="meta-item">
+        <span class="meta-label">Time</span>
+        <span class="meta-val">${fmtDate(tx.timestamp)}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Value</span>
+        <span class="meta-val" style="color:${color}">${fmtAvax(tx.valueAvax)}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">From</span>
+        <span class="meta-val" title="${tx.from}">${truncate(tx.from)}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">To</span>
+        <span class="meta-val" title="${tx.to ?? ''}">${tx.to ? truncate(tx.to) : '—'}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Gas used</span>
+        <span class="meta-val">${tx.gasUsed.toLocaleString()}</span>
+      </div>
+    `;
+
+    // verdict
+    verdictEl.textContent = explain(tx);
+
+    // feature bars
+    const { value, gas, timeDelta } = tx.features;
+    featuresEl.innerHTML = [
+      ["Value",    value.pct],
+      ["Gas used", gas.pct],
+      ["Time gap", timeDelta.pct],
+    ].map(([label, pct]) => `
+      <div class="feature-row">
+        <span class="feature-label">${label}</span>
+        <div class="feature-track">
+          <div class="feature-fill" style="width:${pct}%; background:${color}"></div>
+        </div>
+        <span class="feature-pct">${pct}th pct</span>
+      </div>
+    `).join("");
+
+    // show
+    backdrop.classList.remove("hidden");
+    panel.scrollTop = 0;
+    modalOpen = true;
+    gsap.fromTo(panel, { opacity: 0, scale: 0.96, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "power3.out" });
+  }
+
+  function closeModal() {
+    const backdrop = document.getElementById("tx-modal")!;
+    const panel    = document.getElementById("modal-panel")!;
+    gsap.to(panel, {
+      opacity: 0, scale: 0.96, y: 8, duration: 0.2, ease: "power2.in",
+      onComplete: () => { backdrop.classList.add("hidden"); modalOpen = false; },
+    });
+  }
+
+  // ── Results render ─────────────────────────────────────────────────────────
+
   function renderResults(txs: TxResult[]) {
     const results = document.getElementById("results")!;
     const summary = document.getElementById("summary")!;
@@ -560,47 +838,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
     `;
 
-    tbody.innerHTML = txs.map(tx => {
-      const short  = `${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`;
-      const barW   = Math.round(tx.score * 100);
-      const color  = scoreColor(tx.flag);
-      const { value, gas, timeDelta } = tx.features;
-
-      const detailRow = `
-        <tr class="detail-row hidden" data-detail="${tx.hash}">
-          <td colspan="6">
-            <div class="detail-inner">
-              <p class="detail-verdict">${explain(tx)}</p>
-              <div class="feature-bars">
-                <div class="feature-bar-item">
-                  <span class="feature-label">Value</span>
-                  <div class="feature-track">
-                    <div class="feature-fill" style="width:${value.pct}%; background:${color}"></div>
-                  </div>
-                  <span class="feature-pct">${value.pct}th pct</span>
-                </div>
-                <div class="feature-bar-item">
-                  <span class="feature-label">Gas used</span>
-                  <div class="feature-track">
-                    <div class="feature-fill" style="width:${gas.pct}%; background:${color}"></div>
-                  </div>
-                  <span class="feature-pct">${gas.pct}th pct</span>
-                </div>
-                <div class="feature-bar-item">
-                  <span class="feature-label">Time gap</span>
-                  <div class="feature-track">
-                    <div class="feature-fill" style="width:${timeDelta.pct}%; background:${color}"></div>
-                  </div>
-                  <span class="feature-pct">${timeDelta.pct}th pct</span>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      `;
-
+    tbody.innerHTML = txs.map((tx, i) => {
+      const short = `${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`;
+      const color = scoreColor(tx.flag);
+      const barW  = Math.round(tx.score * 100);
       return `
-        <tr class="tx-row" data-hash="${tx.hash}" style="cursor:none">
+        <tr class="tx-row" data-idx="${i}">
           <td class="td-hash">
             <a href="https://snowtrace.io/tx/${tx.hash}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${short}</a>
           </td>
@@ -620,27 +863,24 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <span class="badge-dot"></span>${tx.flag}
             </span>
           </td>
+          <td><i class="fa-solid fa-chevron-right row-arrow"></i></td>
         </tr>
-        ${detailRow}
       `;
     }).join("");
 
-    // Toggle detail rows on click
+    // attach click to open modal
     tbody.querySelectorAll<HTMLElement>(".tx-row").forEach(row => {
       row.addEventListener("click", () => {
-        const hash      = row.dataset.hash!;
-        const detail    = tbody.querySelector<HTMLElement>(`[data-detail="${hash}"]`);
-        if (!detail) return;
-        const isOpen    = !detail.classList.contains("hidden");
-        detail.classList.toggle("hidden", isOpen);
-        if (!isOpen) return;
-        gsap.fromTo(detail.querySelector(".detail-inner"), { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+        const idx = Number(row.dataset.idx);
+        openModal(txs[idx]);
       });
     });
 
     results.classList.remove("hidden");
     gsap.fromTo(results, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" });
   }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
 
   function initAnomaly() {
     const header  = document.querySelector<HTMLElement>(".project-header");
@@ -655,6 +895,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const btnText = document.getElementById("btn-text")      as HTMLElement;
     const infoMsg = document.getElementById("info-msg")      as HTMLElement;
     const results = document.getElementById("results")       as HTMLElement;
+
+    // modal close
+    document.getElementById("modal-close")!.addEventListener("click", closeModal);
+    document.getElementById("tx-modal")!.addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modalOpen) closeModal();
+    });
 
     function setInfo(msg: string, isError = false) {
       infoMsg.textContent = msg;
@@ -697,7 +946,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           return;
         }
 
-        setInfo(`${data.transactions.length} transactions analyzed.`);
+        setInfo(`${data.transactions.length} transactions analyzed. Click any row to inspect.`);
         renderResults(data.transactions);
 
       } catch {
@@ -708,7 +957,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    // submit on Enter
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") btn.click();
     });
