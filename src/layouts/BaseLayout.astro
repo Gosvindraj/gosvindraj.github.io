@@ -10,15 +10,56 @@ interface Props {
   hideFooter?: boolean;
 }
 
-const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast and developer.", hideFooter = false } = Astro.props;
+const { title, description = "Personal portfolio of Gosvindraj — developer and AI enthusiast building creative projects.", hideFooter = false } = Astro.props;
+
+const siteUrl = "https://gosvindraj.github.io";
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = `${siteUrl}/og-image.png`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Gosvindraj",
+  "alternateName": "Gosh",
+  "url": siteUrl,
+  "sameAs": [
+    "https://github.com/Gosvindraj",
+    "https://www.linkedin.com/in/gosvindraj-m-3306b9280/",
+    "https://www.instagram.com/gosv7ndraj/"
+  ],
+  "jobTitle": "Developer",
+  "description": "Gosvindraj is a developer and AI enthusiast who builds creative software projects."
+};
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary -->
+    <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Gosvindraj" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content="Gosvindraj" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -27,7 +68,6 @@ const { title, description = "Personal portfolio of Gosvindraj, AI enthusiast an
       referrerpolicy="no-referrer"
     />
     <link rel="icon" href="/favicon.ico" />
-    <title>{title}</title>
     <ClientRouter />
   </head>
   <body>
