@@ -245,12 +245,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 </style>
 
-<script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js" is:inline></script>
-<script is:inline>
-  // @ts-nocheck
-  emailjs.init("nWphQI8z1ReghKuBL");
-</script>
-
 <script>
   import gsap from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -371,37 +365,47 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   document.addEventListener("astro:page-load", initContact);
 
-  /* ── EmailJS submit ───────────────────────────── */
+  /* ── Contact form submit ─────────────────────── */
   function initForm() {
-    document.getElementById("contact-form")?.addEventListener("submit", function (event) {
+    document.getElementById("contact-form")?.addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      // @ts-ignore
-      emailjs.sendForm("service_2fltq5k", "template_uoi0y6r", this).then(
-        () => {
-          const form    = document.getElementById("contact-form")    as HTMLElement;
-          const wrapper = document.getElementById("contact-form-wrapper") as HTMLElement;
-          const title   = document.getElementById("form-title")      as HTMLElement;
+      const form    = document.getElementById("contact-form")        as HTMLFormElement;
+      const wrapper = document.getElementById("contact-form-wrapper") as HTMLElement;
+      const title   = document.getElementById("form-title")          as HTMLElement;
+      const msg     = document.getElementById("response-message")    as HTMLElement;
 
+      const name    = (form.querySelector<HTMLInputElement>("#name"))?.value    ?? "";
+      const email   = (form.querySelector<HTMLInputElement>("#email"))?.value   ?? "";
+      const message = (form.querySelector<HTMLTextAreaElement>("#message"))?.value ?? "";
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        if (res.ok) {
           wrapper.style.minHeight = wrapper.getBoundingClientRect().height + "px";
           form.classList.add("fade-out");
           title.classList.add("fade-out");
-
           setTimeout(() => {
             form.style.display  = "none";
             title.style.display = "none";
-            const msg = document.getElementById("response-message") as HTMLElement;
             msg.className = "response-success fade-in";
-            msg.innerHTML = "Message sent — I'll get back to you soon.";
+            msg.textContent = "Message sent — I'll get back to you soon.";
           }, 400);
-        },
-        () => {
-          const msg = document.getElementById("response-message") as HTMLElement;
+        } else {
           msg.className = "response-error";
-          msg.innerHTML = "Something went wrong. Please try again.";
-          setTimeout(() => { msg.className = ""; msg.innerHTML = ""; }, 4000);
+          msg.textContent = "Something went wrong. Please try again.";
+          setTimeout(() => { msg.className = ""; msg.textContent = ""; }, 4000);
         }
-      );
+      } catch {
+        msg.className = "response-error";
+        msg.textContent = "Something went wrong. Please try again.";
+        setTimeout(() => { msg.className = ""; msg.textContent = ""; }, 4000);
+      }
     });
   }
 
