@@ -1,0 +1,571 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="Gosvindraj | Avalanche Anomaly Detector">
+  <section id="project-anomaly">
+    <div class="project-inner">
+
+      <!-- ── Left panel ── -->
+      <div class="project-header">
+        <p class="section-label">project 03</p>
+        <h1 class="project-title">Avalanche<br>Anomaly<br>Detector</h1>
+        <p class="project-desc">
+          paste an Avalanche C-Chain wallet address to analyze its recent
+          transactions for anomalous behaviour. detection runs server-side
+          using an Isolation Forest model on value, gas, and timing patterns.
+        </p>
+
+        <div class="legend">
+          <div class="legend-item"><span class="dot dot-normal"></span>normal</div>
+          <div class="legend-item"><span class="dot dot-suspicious"></span>suspicious</div>
+          <div class="legend-item"><span class="dot dot-anomalous"></span>anomalous</div>
+        </div>
+
+        <a href="/projects" class="back-link">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>back to projects</span>
+        </a>
+      </div>
+
+      <!-- ── Right panel ── -->
+      <div class="anomaly-wrap">
+
+        <div class="input-row">
+          <input
+            type="text"
+            id="address-input"
+            placeholder="0x... Avalanche C-Chain address"
+            spellcheck="false"
+            autocomplete="off"
+            maxlength="42"
+          />
+          <button id="analyze-btn" type="button" data-magnetic>
+            <span id="btn-text">Analyze</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <p class="info-msg" id="info-msg"></p>
+
+        <div id="results" class="hidden">
+          <div class="summary" id="summary"></div>
+          <div class="table-wrap">
+            <table id="tx-table">
+              <thead>
+                <tr>
+                  <th>Hash</th>
+                  <th>Time</th>
+                  <th>Value</th>
+                  <th>Gas</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tx-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #project-anomaly {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    align-items: flex-start;
+    padding: 4rem 8%;
+  }
+
+  .project-inner {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 5rem;
+  }
+
+  /* ── Left panel ── */
+  .project-header {
+    flex: 0 0 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+    position: sticky;
+    top: calc(var(--nav-height) + 2rem);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .project-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .project-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-normal    { background: #6fcf97; }
+  .dot-suspicious{ background: #f2994a; }
+  .dot-anomalous { background: #eb5757; }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.55rem 1.1rem;
+    border-radius: 2px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    align-self: flex-start;
+  }
+
+  .back-link i { font-size: 10px; transition: transform var(--transition); }
+  .back-link:hover { color: var(--text); border-color: var(--border-hover); background: var(--accent-dim); }
+  .back-link:hover i { transform: translateX(-3px); }
+
+  /* ── Right panel ── */
+  .anomaly-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .input-row:focus-within { border-color: var(--border-hover); }
+
+  #address-input {
+    flex: 1;
+    background: var(--surface);
+    border: none;
+    outline: none;
+    padding: 0.85rem 1.1rem;
+    font-family: "Courier New", monospace;
+    font-size: 0.82rem;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    min-width: 0;
+  }
+
+  #address-input::placeholder { color: var(--muted); font-family: "Montserrat", sans-serif; font-size: 0.8rem; letter-spacing: 0.02em; }
+
+  #analyze-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--muted);
+    font-family: "Montserrat", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.85rem 1.4rem;
+    cursor: none;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  #analyze-btn i { font-size: 10px; transition: transform var(--transition); }
+  #analyze-btn:hover { color: var(--text); background: var(--accent-dim); border-color: var(--border-hover); }
+  #analyze-btn:hover i { transform: translateX(3px); }
+  #analyze-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+  .info-msg {
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    min-height: 1.2em;
+  }
+
+  .info-msg.error { color: #eb5757; }
+
+  /* ── Summary ── */
+  .summary {
+    display: flex;
+    gap: 2rem;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-val {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-val.has-anomalies { color: #eb5757; }
+  .stat-val.has-suspicious { color: #f2994a; }
+
+  /* ── Table ── */
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  #tx-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  #tx-table th {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  #tx-table td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  #tx-table tr:hover td { background: var(--surface); }
+
+  .td-hash a {
+    font-family: "Courier New", monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+    cursor: none;
+    transition: opacity var(--transition);
+  }
+
+  .td-hash a:hover { opacity: 0.7; }
+
+  .td-value { font-family: "Courier New", monospace; color: var(--text); }
+
+  /* score bar */
+  .score-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .score-bar-bg {
+    width: 60px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .score-num {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 36px;
+  }
+
+  /* status badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border-radius: 2px;
+  }
+
+  .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .badge-normal    { background: rgba(111,207,151,0.1); color: #6fcf97; }
+  .badge-normal    .badge-dot { background: #6fcf97; }
+  .badge-suspicious{ background: rgba(242,153,74,0.1);  color: #f2994a; }
+  .badge-suspicious .badge-dot { background: #f2994a; }
+  .badge-anomalous { background: rgba(235,87,87,0.1);   color: #eb5757; }
+  .badge-anomalous  .badge-dot { background: #eb5757; }
+
+  .hidden { display: none; }
+
+  @media (max-width: 960px) {
+    .project-inner { flex-direction: column; gap: 3rem; }
+    .project-header { flex: none; position: static; }
+  }
+
+  @media (max-width: 600px) {
+    #project-anomaly { padding: 3rem 6%; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  interface TxResult {
+    hash: string;
+    timestamp: number;
+    from: string;
+    to: string | null;
+    valueAvax: number;
+    gasUsed: number;
+    score: number;
+    flag: "normal" | "suspicious" | "anomalous";
+  }
+
+  function timeAgo(ts: number): string {
+    const diff = Math.floor(Date.now() / 1000) - ts;
+    if (diff < 60)   return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400)return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  function fmtAvax(v: number): string {
+    if (v === 0) return "0 AVAX";
+    if (v < 0.0001) return "<0.0001 AVAX";
+    return `${v.toLocaleString("en-US", { maximumFractionDigits: 4 })} AVAX`;
+  }
+
+  function scoreColor(flag: string): string {
+    if (flag === "anomalous")  return "#eb5757";
+    if (flag === "suspicious") return "#f2994a";
+    return "#6fcf97";
+  }
+
+  function renderResults(txs: TxResult[]) {
+    const results = document.getElementById("results")!;
+    const summary = document.getElementById("summary")!;
+    const tbody   = document.getElementById("tx-body")!;
+
+    const total      = txs.length;
+    const anomalous  = txs.filter(t => t.flag === "anomalous").length;
+    const suspicious = txs.filter(t => t.flag === "suspicious").length;
+
+    summary.innerHTML = `
+      <div class="stat">
+        <span class="stat-label">Analyzed</span>
+        <span class="stat-val">${total}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Anomalous</span>
+        <span class="stat-val ${anomalous > 0 ? "has-anomalies" : ""}">${anomalous}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Suspicious</span>
+        <span class="stat-val ${suspicious > 0 ? "has-suspicious" : ""}">${suspicious}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Normal</span>
+        <span class="stat-val">${total - anomalous - suspicious}</span>
+      </div>
+    `;
+
+    tbody.innerHTML = txs.map(tx => {
+      const short = `${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`;
+      const barW  = Math.round(tx.score * 100);
+      const color = scoreColor(tx.flag);
+      return `
+        <tr>
+          <td class="td-hash">
+            <a href="https://snowtrace.io/tx/${tx.hash}" target="_blank" rel="noopener">${short}</a>
+          </td>
+          <td>${timeAgo(tx.timestamp)}</td>
+          <td class="td-value">${fmtAvax(tx.valueAvax)}</td>
+          <td>${tx.gasUsed.toLocaleString()}</td>
+          <td>
+            <div class="score-wrap">
+              <div class="score-bar-bg">
+                <div class="score-bar-fill" style="width:${barW}%; background:${color}"></div>
+              </div>
+              <span class="score-num">${tx.score.toFixed(3)}</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge badge-${tx.flag}">
+              <span class="badge-dot"></span>${tx.flag}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    results.classList.remove("hidden");
+    gsap.fromTo(results, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" });
+  }
+
+  function initAnomaly() {
+    const header  = document.querySelector<HTMLElement>(".project-header");
+    const wrap    = document.querySelector<HTMLElement>(".anomaly-wrap");
+    if (!header) return;
+
+    gsap.fromTo(header, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 });
+    gsap.fromTo(wrap,   { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
+
+    const input   = document.getElementById("address-input") as HTMLInputElement;
+    const btn     = document.getElementById("analyze-btn")   as HTMLButtonElement;
+    const btnText = document.getElementById("btn-text")      as HTMLElement;
+    const infoMsg = document.getElementById("info-msg")      as HTMLElement;
+    const results = document.getElementById("results")       as HTMLElement;
+
+    function setInfo(msg: string, isError = false) {
+      infoMsg.textContent = msg;
+      infoMsg.className   = "info-msg" + (isError ? " error" : "");
+    }
+
+    btn.addEventListener("click", async () => {
+      const address = input.value.trim();
+
+      if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
+        setInfo("Enter a valid 0x Avalanche C-Chain address.", true);
+        return;
+      }
+
+      btn.disabled  = true;
+      btnText.textContent = "Analyzing...";
+      results.classList.add("hidden");
+      setInfo("fetching transactions from Glacier API...");
+
+      try {
+        const res  = await fetch("/api/anomaly", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ address }),
+        });
+
+        const data = await res.json() as {
+          transactions?: TxResult[];
+          message?: string;
+          error?: string;
+        };
+
+        if (!res.ok || data.error) {
+          setInfo(data.error ?? "Something went wrong. Please try again.", true);
+          return;
+        }
+
+        if (!data.transactions?.length) {
+          setInfo(data.message ?? "No transactions found.", false);
+          return;
+        }
+
+        setInfo(`${data.transactions.length} transactions analyzed.`);
+        renderResults(data.transactions);
+
+      } catch {
+        setInfo("Network error. Please try again.", true);
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = "Analyze";
+      }
+    });
+
+    // submit on Enter
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") btn.click();
+    });
+
+    // magnetic button
+    btn.addEventListener("mousemove", (e) => {
+      const rect = btn.getBoundingClientRect();
+      gsap.to(btn, {
+        x: (e.clientX - rect.left - rect.width  / 2) * 0.35,
+        y: (e.clientY - rect.top  - rect.height / 2) * 0.35,
+        duration: 0.3, ease: "power2.out",
+      });
+    });
+    btn.addEventListener("mouseleave", () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.5)" });
+    });
+  }
+
+  document.addEventListener("astro:page-load", initAnomaly);
+</script>
