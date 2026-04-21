@@ -334,10 +334,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     text-transform: uppercase;
     color: var(--muted);
     text-align: left;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(155, 109, 206, 0.15);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(155, 109, 206, 0.25);
     white-space: nowrap;
-    background: rgba(155, 109, 206, 0.04);
+    background: rgba(155, 109, 206, 0.05);
   }
 
   #tx-table th:last-child { width: 32px; }
@@ -349,15 +349,16 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   .tx-row td {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(155, 109, 206, 0.08);
+    padding: 1.15rem 1.5rem;
+    border-top: 1px solid rgba(155, 109, 206, 0.12);
+    border-bottom: 1px solid rgba(155, 109, 206, 0.12);
     color: var(--muted);
     vertical-align: middle;
     white-space: nowrap;
     transition: background var(--transition), color var(--transition);
   }
 
-  .tx-row:last-child td { border-bottom: none; }
+  .tx-row + .tx-row td { border-top: none; }
 
   .tx-row:hover td {
     background: rgba(155, 109, 206, 0.07);
