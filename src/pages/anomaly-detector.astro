@@ -283,10 +283,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   /* ── Summary ── */
   .summary {
     display: flex;
-    gap: 2rem;
-    padding: 0.9rem 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    gap: 2.5rem;
+    padding: 1.1rem 0 1.4rem;
+    border-top: 1px solid rgba(155, 109, 206, 0.2);
     flex-wrap: wrap;
   }
 
@@ -316,7 +315,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .stat-val.has-suspicious { color: #f2994a; }
 
   /* ── Table ── */
-  .table-wrap { overflow-x: auto; }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid rgba(155, 109, 206, 0.22);
+    border-radius: 3px;
+  }
 
   #tx-table {
     width: 100%;
@@ -331,24 +334,39 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     text-transform: uppercase;
     color: var(--muted);
     text-align: left;
-    padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(155, 109, 206, 0.15);
     white-space: nowrap;
+    background: rgba(155, 109, 206, 0.04);
   }
 
   #tx-table th:last-child { width: 32px; }
 
-  .tx-row { cursor: none; transition: background var(--transition); }
+  .tx-row {
+    cursor: none;
+    transition: background var(--transition), box-shadow var(--transition);
+    position: relative;
+  }
 
   .tx-row td {
-    padding: 0.7rem 0.75rem;
-    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(155, 109, 206, 0.08);
     color: var(--muted);
     vertical-align: middle;
     white-space: nowrap;
+    transition: background var(--transition), color var(--transition);
   }
 
-  .tx-row:hover td { background: var(--surface); }
+  .tx-row:last-child td { border-bottom: none; }
+
+  .tx-row:hover td {
+    background: rgba(155, 109, 206, 0.07);
+    color: var(--text);
+  }
+
+  .tx-row:hover td:first-child {
+    box-shadow: inset 2px 0 0 rgba(155, 109, 206, 0.6);
+  }
 
   .tx-row:hover .row-arrow { opacity: 1; transform: translateX(2px); }
 
