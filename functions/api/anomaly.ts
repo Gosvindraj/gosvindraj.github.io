@@ -79,12 +79,17 @@ function parseWei(value: string): number {
 }
 
 function normalize(data: number[][]): number[][] {
-  const nF  = data[0].length;
+  const nF   = data[0].length;
   const mins = Array.from({ length: nF }, (_, f) => Math.min(...data.map(d => d[f])));
   const maxs = Array.from({ length: nF }, (_, f) => Math.max(...data.map(d => d[f])));
   return data.map(row =>
     row.map((v, f) => maxs[f] === mins[f] ? 0 : (v - mins[f]) / (maxs[f] - mins[f]))
   );
+}
+
+function pct(allVals: number[], val: number): number {
+  const below = allVals.filter(v => v < val).length;
+  return Math.round((below / allVals.length) * 100);
 }
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
@@ -171,18 +176,31 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const scores = isolationForest(normalize(features), 100);
 
+  // Pre-compute per-feature value arrays for percentile calculation
+  const allValues     = features.map(f => Math.expm1(f[0])); // un-log
+  const allGas        = features.map(f => Math.expm1(f[1]));
+  const allTimeDeltas = features.map(f => Math.expm1(f[2]));
+
   // ── Build response (most recent first) ───────────────────────────────────
   const results = asc.map((tx, i) => {
-    const ntx = tx.nativeTransaction;
+    const ntx       = tx.nativeTransaction;
+    const valueAvax = parseWei(ntx.value ?? "0");
+    const gasUsed   = Number(ntx.gasUsed) || 0;
+    const timeDelta = i === 0 ? 0 : ntx.blockTimestamp - asc[i - 1].nativeTransaction.blockTimestamp;
     return {
       hash:      ntx.txHash,
       timestamp: ntx.blockTimestamp,
       from:      ntx.from?.address ?? "",
       to:        ntx.to?.address ?? null,
-      valueAvax: parseWei(ntx.value ?? "0"),
-      gasUsed:   Number(ntx.gasUsed) || 0,
+      valueAvax,
+      gasUsed,
       score:     Math.round(scores[i] * 1000) / 1000,
       flag:      scores[i] > 0.62 ? "anomalous" : scores[i] > 0.52 ? "suspicious" : "normal",
+      features: {
+        value:     { raw: valueAvax,  pct: pct(allValues,     valueAvax)  },
+        gas:       { raw: gasUsed,    pct: pct(allGas,        gasUsed)    },
+        timeDelta: { raw: timeDelta,  pct: pct(allTimeDeltas, timeDelta)  },
+      },
     };
   }).reverse();
 

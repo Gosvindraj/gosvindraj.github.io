@@ -375,6 +375,71 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .badge-anomalous { background: rgba(235,87,87,0.1);   color: #eb5757; }
   .badge-anomalous  .badge-dot { background: #eb5757; }
 
+  /* ── Detail row ── */
+  .detail-row td { padding: 0; border-bottom: 1px solid var(--border); }
+
+  .detail-inner {
+    padding: 1rem 0.75rem 1.25rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .detail-verdict {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 680px;
+  }
+
+  .feature-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .feature-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .feature-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    width: 60px;
+    flex-shrink: 0;
+  }
+
+  .feature-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 260px;
+  }
+
+  .feature-fill {
+    height: 100%;
+    border-radius: 2px;
+    opacity: 0.75;
+  }
+
+  .feature-pct {
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    color: var(--muted);
+    width: 56px;
+    flex-shrink: 0;
+  }
+
+  .tx-row:hover td { background: var(--surface); }
+
   .hidden { display: none; }
 
   @media (max-width: 960px) {
@@ -390,6 +455,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 <script>
   import gsap from "gsap";
 
+  interface FeatureStat { raw: number; pct: number; }
+
   interface TxResult {
     hash: string;
     timestamp: number;
@@ -399,6 +466,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     gasUsed: number;
     score: number;
     flag: "normal" | "suspicious" | "anomalous";
+    features: {
+      value:     FeatureStat;
+      gas:       FeatureStat;
+      timeDelta: FeatureStat;
+    };
   }
 
   function timeAgo(ts: number): string {
@@ -419,6 +491,45 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     if (flag === "anomalous")  return "#eb5757";
     if (flag === "suspicious") return "#f2994a";
     return "#6fcf97";
+  }
+
+  function explain(tx: TxResult): string {
+    const { value, gas, timeDelta } = tx.features;
+    const lines: string[] = [];
+
+    if (tx.flag === "normal") {
+      lines.push("This transaction fits within the wallet's typical activity pattern.");
+    } else {
+      lines.push(
+        tx.flag === "anomalous"
+          ? "This transaction stands out significantly from the wallet's typical behaviour."
+          : "This transaction shows some unusual characteristics."
+      );
+    }
+
+    if (value.pct >= 90)
+      lines.push(`Value of ${fmtAvax(value.raw)} is higher than ${value.pct}% of this wallet's transactions — unusually large.`);
+    else if (value.pct <= 10 && value.raw === 0)
+      lines.push(`Zero AVAX transferred — likely a contract interaction or token swap.`);
+    else if (value.pct <= 10)
+      lines.push(`Value of ${fmtAvax(value.raw)} is lower than ${100 - value.pct}% of this wallet's transactions.`);
+
+    if (gas.pct >= 90)
+      lines.push(`Gas used (${gas.raw.toLocaleString()}) is higher than ${gas.pct}% of transactions — indicates a complex contract execution.`);
+    else if (gas.pct <= 10)
+      lines.push(`Gas used (${gas.raw.toLocaleString()}) is very low — typical of a simple transfer.`);
+
+    if (timeDelta.raw === 0) {
+      lines.push(`First transaction in the analyzed set — no prior timing reference.`);
+    } else if (timeDelta.pct <= 5) {
+      const secs = timeDelta.raw;
+      lines.push(`Sent only ${secs < 60 ? secs + "s" : Math.round(secs / 60) + "m"} after the previous transaction — unusually rapid succession for this wallet.`);
+    } else if (timeDelta.pct >= 90) {
+      const hrs = Math.round(timeDelta.raw / 3600);
+      lines.push(`Over ${hrs}h gap since the previous transaction — longer dormancy period than usual for this wallet.`);
+    }
+
+    return lines.join(" ");
   }
 
   function renderResults(txs: TxResult[]) {
@@ -450,13 +561,48 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     `;
 
     tbody.innerHTML = txs.map(tx => {
-      const short = `${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`;
-      const barW  = Math.round(tx.score * 100);
-      const color = scoreColor(tx.flag);
+      const short  = `${tx.hash.slice(0, 8)}...${tx.hash.slice(-6)}`;
+      const barW   = Math.round(tx.score * 100);
+      const color  = scoreColor(tx.flag);
+      const { value, gas, timeDelta } = tx.features;
+
+      const detailRow = `
+        <tr class="detail-row hidden" data-detail="${tx.hash}">
+          <td colspan="6">
+            <div class="detail-inner">
+              <p class="detail-verdict">${explain(tx)}</p>
+              <div class="feature-bars">
+                <div class="feature-bar-item">
+                  <span class="feature-label">Value</span>
+                  <div class="feature-track">
+                    <div class="feature-fill" style="width:${value.pct}%; background:${color}"></div>
+                  </div>
+                  <span class="feature-pct">${value.pct}th pct</span>
+                </div>
+                <div class="feature-bar-item">
+                  <span class="feature-label">Gas used</span>
+                  <div class="feature-track">
+                    <div class="feature-fill" style="width:${gas.pct}%; background:${color}"></div>
+                  </div>
+                  <span class="feature-pct">${gas.pct}th pct</span>
+                </div>
+                <div class="feature-bar-item">
+                  <span class="feature-label">Time gap</span>
+                  <div class="feature-track">
+                    <div class="feature-fill" style="width:${timeDelta.pct}%; background:${color}"></div>
+                  </div>
+                  <span class="feature-pct">${timeDelta.pct}th pct</span>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+
       return `
-        <tr>
+        <tr class="tx-row" data-hash="${tx.hash}" style="cursor:none">
           <td class="td-hash">
-            <a href="https://snowtrace.io/tx/${tx.hash}" target="_blank" rel="noopener">${short}</a>
+            <a href="https://snowtrace.io/tx/${tx.hash}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${short}</a>
           </td>
           <td>${timeAgo(tx.timestamp)}</td>
           <td class="td-value">${fmtAvax(tx.valueAvax)}</td>
@@ -475,8 +621,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             </span>
           </td>
         </tr>
+        ${detailRow}
       `;
     }).join("");
+
+    // Toggle detail rows on click
+    tbody.querySelectorAll<HTMLElement>(".tx-row").forEach(row => {
+      row.addEventListener("click", () => {
+        const hash      = row.dataset.hash!;
+        const detail    = tbody.querySelector<HTMLElement>(`[data-detail="${hash}"]`);
+        if (!detail) return;
+        const isOpen    = !detail.classList.contains("hidden");
+        detail.classList.toggle("hidden", isOpen);
+        if (!isOpen) return;
+        gsap.fromTo(detail.querySelector(".detail-inner"), { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+      });
+    });
 
     results.classList.remove("hidden");
     gsap.fromTo(results, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" });
