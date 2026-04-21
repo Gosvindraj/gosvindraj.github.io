@@ -146,14 +146,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (txs.length === 0)
     return new Response(JSON.stringify({ transactions: [], message: "No transactions found for this address on Avalanche C-Chain." }), { status: 200, headers: corsHeaders });
 
-  if (txs.length < 5)
-    return new Response(JSON.stringify({ transactions: [], message: "Not enough transactions for analysis — minimum 5 required." }), { status: 200, headers: corsHeaders });
+  // Log first tx so we can inspect the real Glacier schema
+  console.log("Glacier sample tx:", JSON.stringify(txs[0]));
 
-  // Filter out transactions with missing required fields
-  txs = txs.filter(tx => tx.txHash && tx.blockTimestamp && tx.from?.address !== undefined);
-
-  if (txs.length < 5)
-    return new Response(JSON.stringify({ transactions: [], message: "Not enough valid transactions for analysis after filtering." }), { status: 200, headers: corsHeaders });
+  // Only require a hash — handle all other missing fields with defaults
+  txs = txs.filter(tx => !!tx.txHash);
 
   // ── Feature extraction (sort ascending for timeDelta) ─────────────────────
   const asc = [...txs].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
