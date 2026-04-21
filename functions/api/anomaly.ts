@@ -149,6 +149,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (txs.length < 5)
     return new Response(JSON.stringify({ transactions: [], message: "Not enough transactions for analysis — minimum 5 required." }), { status: 200, headers: corsHeaders });
 
+  // Filter out transactions with missing required fields
+  txs = txs.filter(tx => tx.txHash && tx.blockTimestamp && tx.from?.address !== undefined);
+
+  if (txs.length < 5)
+    return new Response(JSON.stringify({ transactions: [], message: "Not enough valid transactions for analysis after filtering." }), { status: 200, headers: corsHeaders });
+
   // ── Feature extraction (sort ascending for timeDelta) ─────────────────────
   const asc = [...txs].sort((a, b) => a.blockTimestamp - b.blockTimestamp);
 
@@ -169,7 +175,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const results = asc.map((tx, i) => ({
     hash:      tx.txHash,
     timestamp: tx.blockTimestamp,
-    from:      tx.from.address,
+    from:      tx.from?.address ?? "",
     to:        tx.to?.address ?? null,
     valueAvax: parseWei(tx.value),
     gasUsed:   Number(tx.gasUsed) || 0,
