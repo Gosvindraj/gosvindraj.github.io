@@ -135,7 +135,7 @@ export default function ChatBot() {
     if (inputRef.current) inputRef.current.style.height = "auto";
 
     try {
-      const res  = await fetch("/api/chat", {
+      const res  = await fetch("https://gosvindraj-github-io.pages.dev/api/chat", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({ message: trimmed, history: messages.slice(-10) }),
