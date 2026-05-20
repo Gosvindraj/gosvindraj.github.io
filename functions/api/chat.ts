@@ -87,7 +87,7 @@ Contact & Socials:
 - Instagram: https://www.instagram.com/gosv7ndraj/
 - Contact form available at /contact (routes to his email)`;
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequest: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
   const origin = request.headers.get("Origin") ?? "";
