@@ -15,7 +15,7 @@ const timeline = [
     range: "2011 – 2015",
     title: "Secondary School",
     place: "Penang Free School, Penang",
-    desc: "one of malaysia's oldest schools. walked in as a kid, left as someone who actually had direction. SPM came around — pulled 8As. more importantly: around 12-13, i discovered gaming and got obsessed with how people could connect virtually. that was the spark.",
+    desc: "one of malaysia's oldest schools. walked in as a kid, left as someone who actually had direction. SPM came around, pulled 8As. more importantly: around 12-13, i discovered gaming and got obsessed with how people could connect virtually. that was the spark.",
     tags: ["Secondary School", "First Contact"],
   },
   {
@@ -23,13 +23,13 @@ const timeline = [
     range: "2016 – 2017",
     title: "Matriculation",
     place: "KMKT, Kelantan",
-    desc: "packed my bags, moved to kelantan, and took my first real CS course. it was basic — very basic. but somewhere between the if-else blocks and the syntax errors, something clicked. i thought: yeah, i can see myself being happy doing this.",
+    desc: "packed my bags, moved to kelantan, and took my first real CS course. it was basic. very basic. but somewhere between the if-else blocks and the syntax errors, something clicked. i thought: yeah, i can see myself being happy doing this.",
     tags: ["Matriculation", "CS Begins"],
   },
   {
     year: "2017",
     range: "2017 – 2021",
-    title: "University — Degree",
+    title: "Degree",
     place: "Universiti Sains Malaysia, Penang",
     desc: "back home in penang. enrolled in BSc Computer Science, majoring in AI, minoring in Management. four years of figuring things out, building things, and learning what i actually care about.",
     tags: ["University", "AI", "USM"],
@@ -39,13 +39,13 @@ const timeline = [
     range: "2022 – 2025",
     title: "Work",
     place: "Remote",
-    desc: "spent 3 years working part-time in the web3 space — technical support and community work in the blockchain industry. got hands-on with the real side of crypto beyond the hype.",
+    desc: "spent 3 years working part-time in the web3 space: technical support and community work in the blockchain industry. got hands-on with the real side of crypto beyond the hype.",
     tags: ["Web3", "Blockchain", "Work"],
   },
   {
     year: "2023",
     range: "2023 – 2024",
-    title: "University — Masters",
+    title: "Masters",
     place: "Universiti Sains Malaysia, Penang",
     desc: "went back for an MSc in Computer Science. mixed mode, dissertation in AI and Cybersecurity. another two years of going deep on things that actually matter.",
     tags: ["Masters", "AI", "Cybersecurity"],
@@ -55,7 +55,7 @@ const timeline = [
     range: "2025 – Present",
     title: "Building & Exploring",
     place: "Penang / KL / The Internet",
-    desc: "working on personal projects, doing volunteer blockchain education, and going deep on the AI × blockchain intersection. not chasing a title — just chasing the thing that's most interesting right now. if you're reading this — hi. we should probably talk.",
+    desc: "working on personal projects, doing volunteer blockchain education, and going deep on the AI × blockchain intersection. not chasing a title, just chasing the thing that's most interesting right now. if you're reading this, hi. we should probably talk.",
     tags: ["Present", "AI", "Blockchain", "Open to Collab"],
   },
 ];
@@ -150,7 +150,7 @@ const cards = [
         </h1>
         <div class="intro-bio" id="intro-bio">
           <p>
-            i get obsessed with things quickly — AI, blockchain, whatever's next —
+            i get obsessed with things quickly: AI, blockchain, whatever's next,
             and i build stuff to understand them better.
             most of it goes nowhere. some of it actually works.
             all of it teaches me something.
@@ -206,7 +206,7 @@ const cards = [
           <ul class="ep-list">
             {(c.body ?? []).map(item => (
               <li class="ep-item">
-                <span class="ep-bullet">—</span>
+                <span class="ep-bullet">·</span>
                 <span>{item}</span>
               </li>
             ))}

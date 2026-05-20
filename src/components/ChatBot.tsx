@@ -314,7 +314,7 @@ export default function ChatBot() {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
               </div>
-              Ask me anything about Gosh — his projects, skills, background, or how to get in touch.
+              Ask me anything about Gosh: his projects, skills, background, or how to get in touch.
             </div>
           )}
 
@@ -398,7 +398,7 @@ export default function ChatBot() {
             value={input}
             onChange={handleInput}
             onKeyDown={handleKeyDown}
-            placeholder={isExhausted ? "Session limit reached — reload to continue" : "Ask about Gosh…"}
+            placeholder={isExhausted ? "Session limit reached. Reload to continue." : "Ask about Gosh…"}
             disabled={isExhausted || loading}
             rows={1}
             maxLength={MAX_CHARS}

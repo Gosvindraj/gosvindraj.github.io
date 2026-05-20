@@ -696,7 +696,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   function truncate(addr: string, head = 8, tail = 6): string {
-    if (!addr) return "—";
+    if (!addr) return "-";
     return `${addr.slice(0, head)}...${addr.slice(-tail)}`;
   }
 
@@ -715,25 +715,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
 
     if (value.pct >= 90)
-      lines.push(`Value of ${fmtAvax(value.raw)} is higher than ${value.pct}% of this wallet's transactions — unusually large.`);
+      lines.push(`Value of ${fmtAvax(value.raw)} is higher than ${value.pct}% of this wallet's transactions. Unusually large.`);
     else if (value.pct <= 10 && value.raw === 0)
-      lines.push(`Zero AVAX transferred — likely a contract interaction or token swap.`);
+      lines.push(`Zero AVAX transferred, likely a contract interaction or token swap.`);
     else if (value.pct <= 10)
       lines.push(`Value of ${fmtAvax(value.raw)} is lower than ${100 - value.pct}% of this wallet's transactions.`);
 
     if (gas.pct >= 90)
-      lines.push(`Gas used (${gas.raw.toLocaleString()}) is higher than ${gas.pct}% of transactions — indicates a complex contract execution.`);
+      lines.push(`Gas used (${gas.raw.toLocaleString()}) is higher than ${gas.pct}% of transactions, indicating a complex contract execution.`);
     else if (gas.pct <= 10)
-      lines.push(`Gas used (${gas.raw.toLocaleString()}) is very low — typical of a simple transfer.`);
+      lines.push(`Gas used (${gas.raw.toLocaleString()}) is very low, typical of a simple transfer.`);
 
     if (timeDelta.raw === 0) {
-      lines.push(`First transaction in the analyzed set — no prior timing reference.`);
+      lines.push(`First transaction in the analyzed set, no prior timing reference.`);
     } else if (timeDelta.pct <= 5) {
       const secs = timeDelta.raw;
-      lines.push(`Sent only ${secs < 60 ? secs + "s" : Math.round(secs / 60) + "m"} after the previous transaction — unusually rapid succession for this wallet.`);
+      lines.push(`Sent only ${secs < 60 ? secs + "s" : Math.round(secs / 60) + "m"} after the previous transaction, unusually rapid succession for this wallet.`);
     } else if (timeDelta.pct >= 90) {
       const hrs = Math.round(timeDelta.raw / 3600);
-      lines.push(`Over ${hrs}h gap since the previous transaction — longer dormancy period than usual for this wallet.`);
+      lines.push(`Over ${hrs}h gap since the previous transaction, longer dormancy than usual for this wallet.`);
     }
 
     return lines.join(" ");
@@ -793,7 +793,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
       <div class="meta-item">
         <span class="meta-label">To</span>
-        <span class="meta-val" title="${tx.to ?? ''}">${tx.to ? truncate(tx.to) : '—'}</span>
+        <span class="meta-val" title="${tx.to ?? ''}">${tx.to ? truncate(tx.to) : '-'}</span>
       </div>
       <div class="meta-item">
         <span class="meta-label">Gas used</span>

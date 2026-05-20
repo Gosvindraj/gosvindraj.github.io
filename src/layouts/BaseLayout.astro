@@ -10,7 +10,7 @@ interface Props {
   hideFooter?: boolean;
 }
 
-const { title, description = "Personal portfolio of Gosvindraj — developer and AI enthusiast building creative projects.", hideFooter = false } = Astro.props;
+const { title, description = "Personal portfolio of Gosvindraj, developer and AI enthusiast building creative projects.", hideFooter = false } = Astro.props;
 
 const siteUrl = "https://gosvindraj.github.io";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
