@@ -188,7 +188,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         Authorization: `Bearer ${env.GROK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "grok-3-fast",
+        model: "grok-4.3",
         messages,
         max_tokens: 350,
         temperature: 0.7,
