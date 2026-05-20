@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git
+
+- Only commit and push when explicitly asked to.
+
 ## Writing style
 
 - **No em dashes (`—`)** anywhere in user-facing text. Use a comma, colon, or period instead.

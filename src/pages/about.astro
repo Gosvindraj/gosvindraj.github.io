@@ -90,23 +90,19 @@ const cards = [
   },
   {
     id: "tried",
-    icon: "fa-solid fa-person-running",
-    tag: "attempts",
-    title: "things i've tried",
-    preview: "some stuck. most didn't. all were worth it.",
-    body: [
-      "this section is still being written. check back soon.",
-    ],
+    icon: "fa-solid fa-code",
+    tag: "stack",
+    title: "tech stack",
+    preview: "what i actually build with.",
+    body: [],
   },
   {
     id: "facts",
     icon: "fa-solid fa-face-grin-stars",
     tag: "personality",
-    title: "random facts about me",
-    preview: "the stuff that doesn't fit anywhere else.",
-    body: [
-      "this section is still being written. check back soon.",
-    ],
+    title: "how i'm wired",
+    preview: "yellow, with range.",
+    body: [],
   },
   {
     id: "places",
@@ -195,8 +191,87 @@ const cards = [
         </div>
       </div>
 
+      <!-- skills panel -->
+      <div class="ep-content" data-panel="tried" style="display:none">
+        <div class="ep-header">
+          <span class="ep-tag">stack</span>
+          <h3 class="ep-title">tech stack</h3>
+          <p class="ep-desc">languages, tools, frameworks. some daily drivers, some experiments.</p>
+        </div>
+        <div class="skills-grid">
+          <div class="skills-group">
+            <span class="skills-group-label">languages</span>
+            <div class="skills-tags">
+              <span class="skill-tag">JavaScript</span>
+              <span class="skill-tag">TypeScript</span>
+              <span class="skill-tag">Python</span>
+              <span class="skill-tag">HTML</span>
+              <span class="skill-tag">CSS</span>
+            </div>
+          </div>
+          <div class="skills-group">
+            <span class="skills-group-label">frameworks & libraries</span>
+            <div class="skills-tags">
+              <span class="skill-tag">Astro</span>
+              <span class="skill-tag">React</span>
+              <span class="skill-tag">GSAP</span>
+              <span class="skill-tag">Django</span>
+            </div>
+          </div>
+          <div class="skills-group">
+            <span class="skills-group-label">tools & infra</span>
+            <div class="skills-tags">
+              <span class="skill-tag">Git</span>
+              <span class="skill-tag">Node.js</span>
+              <span class="skill-tag">AWS</span>
+              <span class="skill-tag">Heroku</span>
+              <span class="skill-tag">Cloudflare</span>
+              <span class="skill-tag">Supabase</span>
+            </div>
+          </div>
+          <div class="skills-group">
+            <span class="skills-group-label">ai & llms</span>
+            <div class="skills-tags">
+              <span class="skill-tag">RAG</span>
+              <span class="skill-tag">xAI Grok</span>
+              <span class="skill-tag">Claude</span>
+              <span class="skill-tag">OpenAI Codex</span>
+              <span class="skill-tag">MCP</span>
+            </div>
+          </div>
+          <div class="skills-group">
+            <span class="skills-group-label">blockchain</span>
+            <div class="skills-tags">
+              <span class="skill-tag">Solidity</span>
+              <span class="skill-tag">Remix IDE</span>
+              <span class="skill-tag">EVM</span>
+              <span class="skill-tag">x402</span>
+              <span class="skill-tag">Avalanche</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- personality panel -->
+      <div class="ep-content" data-panel="facts" style="display:none">
+        <div class="ep-header">
+          <span class="ep-tag">personality</span>
+          <h3 class="ep-title">how i'm wired</h3>
+          <p class="ep-desc">yellow, with range.</p>
+        </div>
+        <div class="facts-prose">
+          <p class="facts-lead"><span class="c-yellow">yellow</span>, according to surrounded by idiots. enthusiastic, talks too much, gets excited about everything, and absolutely hates sitting still.</p>
+          <p>ideas come fast. execution is the slower part. i'm working on the gap — and i've made peace with having twelve half-started projects and zero regrets.</p>
+          <p>can shift into <span class="c-blue">blue</span> when the work needs precision, <span class="c-red">red</span> when something needs to get done, <span class="c-green">green</span> when someone just needs to be heard. still <span class="c-yellow">yellow</span> underneath. always.</p>
+          <p>naturally optimistic, probably to a fault. high energy in person, surprisingly focused when alone. the two modes don't always look like the same person.</p>
+          <button class="facts-ref-btn" id="facts-diagram-btn">
+            not sure what the colours mean? <span class="facts-ref-arrow">↗</span>
+          </button>
+        </div>
+      </div>
+
       <!-- all other panels -->
-      {cards.filter(c => c.id !== "journey").map((c) => (
+      {cards.filter(c => c.id !== "journey" && c.id !== "tried" && c.id !== "facts").map((c) => (
         <div class="ep-content" data-panel={c.id} style="display:none">
           <div class="ep-header">
             <span class="ep-tag">{c.tag}</span>
@@ -244,6 +319,29 @@ const cards = [
   </section>
 
   </div><!-- /about-layout -->
+
+  <!-- ── Personality model modal ───────────────────── -->
+  <div id="diagram-modal" aria-modal="true" role="dialog" aria-label="Personality model">
+    <div class="dm-backdrop" id="dm-backdrop"></div>
+    <div class="dm-box">
+      <button class="dm-close" id="dm-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      <a class="dm-title" href="https://www.surroundedbyidiots.com" target="_blank" rel="noopener noreferrer">surrounded by idiots ↗</a>
+      <div class="q-diagram">
+        <p class="q-label q-top">Task-Oriented &amp; Issue-Oriented</p>
+        <div class="q-middle">
+          <div class="q-side-label q-left-label">Introvert, Passive &amp; Reserved</div>
+          <div class="q-cells">
+            <div class="q-cell q-blue">Blue</div>
+            <div class="q-cell q-red">Red</div>
+            <div class="q-cell q-green">Green</div>
+            <div class="q-cell q-yellow">Yellow</div>
+          </div>
+          <div class="q-side-label q-right-label">Extrovert, Active &amp; Implementor</div>
+        </div>
+        <p class="q-label q-bottom">Relation-Oriented</p>
+      </div>
+    </div>
+  </div>
 
 </BaseLayout>
 
@@ -765,6 +863,252 @@ const cards = [
 
   }
 
+  /* ── Skills panel ───────────────────────────── */
+  .skills-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: 0 0 1.5rem;
+  }
+
+  .skills-group-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.6rem;
+  }
+
+  .skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .skill-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 2px;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+  }
+
+  .skill-tag:hover {
+    border-color: rgba(155, 109, 206, 0.5);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+
+  /* ── Personality prose panel ────────────────── */
+  .facts-prose {
+    padding: 0 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .facts-prose p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+
+  .c-yellow { color: #d4b832; font-weight: 600; }
+  .c-blue   { color: #7ec8e8; font-weight: 600; }
+  .c-red    { color: #e88888; font-weight: 600; }
+  .c-green  { color: #80cc85; font-weight: 600; }
+
+  .facts-lead {
+    font-size: 0.95rem !important;
+    color: var(--text) !important;
+    font-style: italic;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+
+  /* ── Facts diagram button ───────────────────── */
+  .facts-ref-btn {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 0.75rem;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--accent);
+    opacity: 0.85;
+    cursor: none;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(155, 109, 206, 0.35);
+    transition: opacity var(--transition), text-decoration-color var(--transition);
+  }
+
+  .facts-ref-btn:hover {
+    opacity: 1;
+    text-decoration-color: rgba(155, 109, 206, 0.8);
+  }
+
+  .facts-ref-arrow {
+    font-style: normal;
+    font-size: 0.7rem;
+  }
+
+  /* ── Diagram modal ───────────────────────────── */
+  #diagram-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dm-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 11, 13, 0.85);
+    backdrop-filter: blur(6px);
+  }
+
+  .dm-box {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2rem;
+    width: min(480px, 90vw);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  }
+
+  .dm-close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--muted);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: none;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+  }
+
+  .dm-close:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+
+  .dm-title {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    transition: opacity var(--transition);
+  }
+
+  .dm-title:hover { opacity: 0.75; }
+
+  /* ── Quadrant diagram ────────────────────────── */
+  .q-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .q-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .q-middle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .q-side-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    line-height: 1.7;
+    flex-shrink: 0;
+    width: 56px;
+  }
+
+  .q-left-label { text-align: right; }
+  .q-right-label { text-align: left; }
+
+  .q-cells {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    aspect-ratio: 1;
+    position: relative;
+  }
+
+  /* axis cross lines */
+  .q-cells::before,
+  .q-cells::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .q-cells::before { left: 50%; top: -6px; bottom: -6px; width: 1px; transform: translateX(-50%); }
+  .q-cells::after  { top: 50%; left: -6px; right: -6px; height: 1px; transform: translateY(-50%); }
+
+  .q-cell {
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    position: relative;
+    min-height: 80px;
+    border: 1px solid;
+  }
+
+  .q-blue  { background: rgba(58, 159, 212, 0.1);  border-color: rgba(58, 159, 212, 0.3);  color: #7ec8e8; }
+  .q-red   { background: rgba(212, 64, 64, 0.1);   border-color: rgba(212, 64, 64, 0.3);   color: #e88888; }
+  .q-green { background: rgba(74, 173, 82, 0.1);   border-color: rgba(74, 173, 82, 0.3);   color: #80cc85; }
+  .q-yellow {
+    background: rgba(212, 184, 50, 0.1);
+    border-color: rgba(212, 184, 50, 0.3);
+    color: #d4b832;
+  }
+
   /* ── Mobile ──────────────────────────────────── */
   @media (max-width: 700px) {
     #intro-default { padding: 4rem 6%; min-height: unset; }
@@ -775,6 +1119,23 @@ const cards = [
     .ec-card       { opacity: 1; transform: none !important; }
     .ep-content    { padding: 1.5rem; }
     .tl-left-col   { width: 38px; }
+
+    /* ── Tech stack ── */
+    .skills-grid     { gap: 1.1rem; }
+    .skill-tag       { font-size: 10px; padding: 0.25rem 0.55rem; }
+
+    /* ── Personality prose ── */
+    .facts-lead      { font-size: 0.875rem !important; }
+    .facts-ref-btn   { margin-top: 0.5rem; }
+
+    /* ── Personality modal ── */
+    .dm-box          { padding: 1.25rem; }
+    .dm-title        { margin-bottom: 1rem; }
+    .q-side-label    { width: auto; writing-mode: vertical-rl; font-size: 10px; letter-spacing: 0.04em; }
+    .q-left-label    { transform: rotate(180deg); text-align: right; }
+    .q-middle        { gap: 0.35rem; justify-content: center; }
+    .q-cells         { flex: 1; }
+    .q-cell          { min-height: 64px; font-size: 0.78rem; }
   }
 </style>
 
@@ -998,6 +1359,24 @@ const cards = [
         { opacity: 1, x: 0, duration: 0.4, stagger: 0.08, ease: "power3.out", delay: 0.1 }
       );
     }
+    function animateSkillsIn() {
+      gsap.fromTo(introPanel.querySelectorAll<HTMLElement>(".skills-group"),
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.09, ease: "power3.out", delay: 0.1 }
+      );
+    }
+    function animateFactsIn() {
+      gsap.fromTo(introPanel.querySelectorAll<HTMLElement>(".facts-prose > *"),
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power3.out", delay: 0.1 }
+      );
+    }
+    function animateForCard(id: string) {
+      if (id === "journey") animateTimelineIn();
+      else if (id === "tried") animateSkillsIn();
+      else if (id === "facts") animateFactsIn();
+      else animateListIn();
+    }
 
     function openPanel(cardId: string) {
       const next = introPanel.querySelector<HTMLElement>(`[data-panel="${cardId}"]`);
@@ -1010,6 +1389,10 @@ const cards = [
         gsap.set(introPanel, { opacity: 0 });
         if (cardId === "journey") {
           gsap.set(introPanel.querySelectorAll(".tl-row"), { opacity: 0, x: -18 });
+        } else if (cardId === "tried") {
+          gsap.set(introPanel.querySelectorAll(".skills-group"), { opacity: 0, y: 12 });
+        } else if (cardId === "facts") {
+          gsap.set(introPanel.querySelectorAll(".facts-prose > *"), { opacity: 0, y: 14 });
         } else {
           gsap.set(introPanel.querySelectorAll(".ep-item"), { opacity: 0, x: -14 });
         }
@@ -1021,7 +1404,7 @@ const cards = [
             document.getElementById("about-intro")?.scrollTo({ top: 0, behavior: "instant" });
             gsap.to(introPanel, {
               opacity: 1, duration: 0.35, ease: "power3.out",
-              onComplete: () => { if (cardId === "journey") animateTimelineIn(); else animateListIn(); },
+              onComplete: () => animateForCard(cardId),
             });
           },
         });
@@ -1044,13 +1427,15 @@ const cards = [
             // pre-hide animated children before the panel becomes visible
             if (cardId === "journey") {
               gsap.set(next.querySelectorAll(".tl-row"), { opacity: 0, x: -18 });
+            } else if (cardId === "tried") {
+              gsap.set(next.querySelectorAll(".skills-group"), { opacity: 0, y: 12 });
             } else {
               gsap.set(next.querySelectorAll(".ep-item"), { opacity: 0, x: -14 });
             }
             next.style.display = "block";
             gsap.fromTo(next, { opacity: 0, y: 12 }, {
               opacity: 1, y: 0, duration: 0.35, ease: "power3.out",
-              onComplete: () => { if (cardId === "journey") animateTimelineIn(); else animateListIn(); },
+              onComplete: () => animateForCard(cardId),
             });
           },
         });
@@ -1210,7 +1595,37 @@ const cards = [
   }
   ── end Section Nav ── */
 
+  function initFactsModal() {
+    const btn      = document.getElementById("facts-diagram-btn");
+    const modal    = document.getElementById("diagram-modal");
+    const closeBtn = document.getElementById("dm-close");
+    const backdrop = document.getElementById("dm-backdrop");
+    if (!btn || !modal) return;
+
+    function openModal() {
+      modal.style.display = "flex";
+      gsap.fromTo(modal,     { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" });
+      gsap.fromTo(".dm-box", { scale: 0.93, y: 12 }, { scale: 1, y: 0, duration: 0.3, ease: "back.out(1.8)" });
+    }
+
+    function closeModal() {
+      gsap.to(".dm-box", { scale: 0.95, y: 8, duration: 0.18, ease: "power2.in" });
+      gsap.to(modal, { opacity: 0, duration: 0.2, ease: "power2.in",
+        onComplete: () => { modal.style.display = "none"; }
+      });
+    }
+
+    btn.addEventListener("click", openModal);
+    closeBtn?.addEventListener("click", closeModal);
+    backdrop?.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.style.display === "flex") closeModal();
+    });
+  }
+
   document.addEventListener("astro:page-load", initAbout);
   document.addEventListener("astro:page-load", initExplore);
+  document.addEventListener("astro:page-load", initFactsModal);
   // document.addEventListener("astro:page-load", initAboutNav);
 </script>
