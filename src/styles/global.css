@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Gruppo&family=Montserrat:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Gruppo&family=JetBrains+Mono:wght@300;400&family=Montserrat:wght@300;400;500;600&display=swap');
 
 /* ── Design Tokens ─────────────────────────────── */
 :root {
@@ -21,7 +21,19 @@
   padding: 0;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 109, 206, 0.25) transparent;
+}
+
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 109, 206, 0.25);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(155, 109, 206, 0.5); }
 
 body {
   background-color: var(--bg);
@@ -88,7 +100,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 #preloader-count {
-  font-family: "Courier New", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   letter-spacing: 0.25em;
   color: var(--muted);
@@ -267,7 +279,16 @@ header {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
 }
+
+header.nav-translucent {
+  background: rgba(11, 11, 13, 0.12);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-bottom-color: transparent;
+}
+
 
 #logo {
   font-family: "Gruppo", sans-serif;
@@ -280,6 +301,17 @@ header {
 }
 
 #logo:hover { color: var(--accent); }
+
+#logo-img {
+  height: 38px;
+  width: auto;
+  display: block;
+  cursor: none;
+  opacity: 0.9;
+  transition: opacity var(--transition);
+}
+
+#logo-img:hover { opacity: 1; }
 
 .nav_links {
   list-style: none;
@@ -392,6 +424,10 @@ main {
   padding-top: var(--nav-height);
   min-height: 100vh;
   position: relative;
+}
+
+main.home {
+  padding-top: 0;
 }
 
 /* ── Footer ────────────────────────────────────── */

@@ -86,6 +86,19 @@ export default function ChatBot() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  // Ctrl+/ to toggle chatbot
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!visible) return;
+      if (e.ctrlKey && e.key === "/") {
+        e.preventDefault();
+        setOpen(o => !o);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [visible]);
+
   // Restore session from localStorage
   useEffect(() => {
     try {

@@ -8,9 +8,10 @@ interface Props {
   title: string;
   description?: string;
   hideFooter?: boolean;
+  pageClass?: string;
 }
 
-const { title, description = "Personal portfolio of Gosvindraj, developer and AI enthusiast building creative projects.", hideFooter = false } = Astro.props;
+const { title, description = "Personal portfolio of Gosvindraj, developer and AI enthusiast building creative projects.", hideFooter = false, pageClass = "" } = Astro.props;
 
 const siteUrl = "https://gosvindraj.github.io";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
@@ -67,7 +68,7 @@ const jsonLd = {
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <ClientRouter />
   </head>
   <body>
@@ -93,7 +94,7 @@ const jsonLd = {
     <div id="cursor-ring" transition:persist></div>
 
     <Navbar />
-    <main>
+    <main class={pageClass}>
       <slot />
     </main>
 

@@ -8,7 +8,7 @@ const links = [
 ---
 
 <header>
-  <a href="/"><div id="logo">GOSVINDRAJ</div></a>
+  <a href="/"><img src="/logos/purple-text/mark-gosh-ligature-heavy-purple-text.svg" id="logo-img" alt="Gosvindraj" /></a>
   <nav>
     <ul class="nav_links">
       {links.map((link) => (
@@ -42,6 +42,10 @@ const links = [
   import gsap from "gsap";
 
   function initNavbar() {
+    /* ── Translucent nav on homepage ─────────── */
+    const isHome = window.location.pathname === "/" || window.location.pathname === "/index.html";
+    document.querySelector("header")?.classList.toggle("nav-translucent", isHome);
+
     /* ── Mobile toggle ───────────────────────── */
     const toggleBtn    = document.querySelector(".toggle_btn");
     const dropdownMenu = document.querySelector(".dropdown_menu");

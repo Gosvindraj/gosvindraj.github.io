@@ -1,7 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="Gosvindraj | Developer & AI Enthusiast" description="Gosvindraj's personal portfolio, developer and AI enthusiast building creative software projects.">
+
+<style is:global>
+  /* Suppress scrollbar while the found-me overlay is covering the page.
+     Kicks in before JS runs so there is no flash. Automatically removed
+     once JS sets display:none on the screen element after dismissal. */
+  html:has(#found-me-screen:not([style*="none"])) {
+    overflow: hidden;
+  }
+</style>
+<BaseLayout title="Gosvindraj | Developer & AI Enthusiast" description="Gosvindraj's personal portfolio, developer and AI enthusiast building creative software projects." pageClass="home">
   <section id="hero">
     <canvas id="matrix-canvas"></canvas>
     <div class="hero-vignette"></div>
@@ -21,7 +30,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <div id="home-intro">
       <h2 class="intro-heading" id="intro-heading">
         <span class="char-wrap"><span class="char-line">hi, i'm</span></span>
-        <span class="char-wrap accent-line"><span class="char-line">gosh.</span></span>
+        <span class="char-wrap accent-line"><span class="char-line">gosvindraj.</span></span>
       </h2>
       <div class="intro-bio" id="intro-bio">
         <p>just me using AI to build random things,<br>i get bored fast and move on to the next idea.</p>
@@ -58,13 +67,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <style>
   #hero {
-    min-height: calc(100vh - var(--nav-height));
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 4rem 8%;
+    padding: calc(var(--nav-height) + 2rem) 8% 4rem;
     position: relative;
     overflow: hidden;
   }
@@ -224,7 +233,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     width: 100%;
   }
 
-  .intro-heading {
+  #hero .intro-heading {
     font-family: "Cormorant Garamond", serif;
     font-size: clamp(3rem, 7vw, 6rem);
     font-weight: 300;
@@ -393,7 +402,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     const ctx = canvas.getContext("2d")!;
     const FONT = 13;
-    const FONT_FAMILY = "'Courier New', monospace";
+    const FONT_FAMILY = "'JetBrains Mono', monospace";
 
     function resize() {
       canvas.width  = hero.offsetWidth;
@@ -817,14 +826,24 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     heroName.addEventListener("mousemove",  onMove);
     heroName.addEventListener("mouseleave", onLeave);
 
-    /* ── Click → transition ──────────────────── */
-    btn.addEventListener("click", () => {
+    /* ── Click / Enter → transition ─────────── */
+    function dismiss() {
       foundMeSeen = true;
       if (stopGlitch) stopGlitch();
       clearTimeout(driftStart);
       clearInterval(driftInterval);
       heroName.removeEventListener("mousemove",  onMove);
       heroName.removeEventListener("mouseleave", onLeave);
+      document.removeEventListener("keydown", onEnterKey);
+    }
+
+    function onEnterKey(e: KeyboardEvent) {
+      if (e.key === "Enter") { e.preventDefault(); triggerTransition(); }
+    }
+    document.addEventListener("keydown", onEnterKey);
+
+    function triggerTransition() {
+      dismiss();
 
       const screen = document.getElementById("found-me-screen")!;
 
@@ -849,7 +868,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         .to(["#found-me-sub", "#found-me-note", btn], {
           opacity: 0, y: -8, duration: 0.3, ease: "power2.in",
         }, "<+0.05");
-    });
+    }
+
+    btn.addEventListener("click", triggerTransition);
   }
 
   /* ════════════════════════════════════════════
