@@ -261,11 +261,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         ctx.fillStyle = "rgba(155,109,206,0.08)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "rgba(255,255,255,0.12)";
-        ctx.font = "bold 18px "JetBrains Mono", monospace";
+        ctx.font = "bold 18px 'JetBrains Mono', monospace";
         ctx.textAlign = "center";
         ctx.fillText("SNAKE", canvas.width / 2, canvas.height / 2 - 10);
         ctx.fillStyle = "rgba(155,109,206,0.5)";
-        ctx.font = "11px "JetBrains Mono", monospace";
+        ctx.font = "11px 'JetBrains Mono', monospace";
         ctx.fillText("PRESS ENTER TO START", canvas.width / 2, canvas.height / 2 + 18);
         return;
       }
@@ -296,11 +296,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         ctx.fillStyle = "rgba(0,0,0,0.75)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "rgba(255,255,255,0.85)";
-        ctx.font      = "bold 16px "JetBrains Mono", monospace";
+        ctx.font      = "bold 16px 'JetBrains Mono', monospace";
         ctx.textAlign = "center";
         ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 24);
         ctx.fillStyle = "rgba(155,109,206,0.8)";
-        ctx.font      = "12px "JetBrains Mono", monospace";
+        ctx.font      = "12px 'JetBrains Mono', monospace";
         ctx.fillText(`score: ${score}  ·  best: ${highScore}`, canvas.width / 2, canvas.height / 2 + 4);
       }
     }
