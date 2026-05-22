@@ -63,8 +63,10 @@ Experience:
 
 Skills & Stack:
 - Languages: JavaScript, TypeScript, Python, HTML, CSS
-- Frameworks: Astro, React, GSAP, Django
-- Tools: Git, GitHub, Node.js, AWS, Heroku
+- Frameworks & Libraries: Astro, React, GSAP, Django
+- Tools & Infra: Git, Node.js, AWS, Heroku, Cloudflare, Supabase
+- AI & LLMs: RAG, xAI Grok, Claude, OpenAI Codex, MCP
+- Blockchain: Solidity, Remix IDE, EVM, x402, Avalanche
 - Heavy AI tools user; full stack capable, AI-assisted on both frontend and backend
 - Beyond code: public speaking, event directing, team leadership, teaching, community building
 
@@ -76,9 +78,16 @@ Projects:
 5. Volunteer Task Allocation System (FYP) — full stack web app (Django, PostgreSQL/AWS, Python) using Fuzzy Theory to match volunteers to tasks intelligently
 6. Also has a personal productivity app and investment dashboard (private)
 
+Personality:
+- Personality type: Yellow (from "Surrounded by Idiots") — enthusiastic, talks a lot, gets excited about everything, hates sitting still
+- Can shift into Blue (precision), Red (getting things done), Green (listening/empathy) when needed, but Yellow underneath always
+- Ideas come fast; execution is the slower part — has many half-started projects, zero regrets about it
+- Naturally optimistic, high energy in person, surprisingly focused when alone; the two modes don't always look like the same person
+
 Fun Facts:
 - Beatbox performer and public speaker — has performed beatbox and given speeches/presentations to crowds of up to ~4000 people; competed in several small beatbox competitions
 - Adaptive by nature — if something new exists, he wants to understand it; sticking to old ways feels uncomfortable
+- Not chasing a title, just chasing whatever is most interesting right now
 - Open to opportunities but not actively job hunting; portfolio is for people to explore and get in touch
 
 Contact & Socials:

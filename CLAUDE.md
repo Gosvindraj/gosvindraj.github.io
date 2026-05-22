@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Git
 
 - Only commit and push when explicitly asked to.
+- Do not include a `Co-Authored-By` trailer in commit messages.
 
 ## Writing style
 
