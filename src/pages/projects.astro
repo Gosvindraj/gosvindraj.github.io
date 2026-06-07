@@ -28,10 +28,10 @@ const projects = [
   },
   {
     index: "04",
-    title: "Project Four",
-    summary: "Nothing here yet. Stay tuned.",
-    detail: "Details coming soon.",
-    live: "#",
+    title: "AI News Bot",
+    summary: "A grok-powered agent that checks the internet daily, curates top AI news, and auto-posts to Instagram.",
+    detail: "built on xAI Grok's web search API. runs on a daily cron schedule via Cloudflare Workers. live feed below.",
+    live: "#instagram-feed",
     source: "#",
   },
   {
@@ -79,6 +79,18 @@ const projects = [
         </div>
       ))}
     </div>
+  </section>
+
+  <section id="instagram-feed">
+    <div class="insta-header">
+      <p class="section-label" id="insta-label">AI Daily Roundup</p>
+      <div class="insta-profile-link">
+        <i class="fa-brands fa-instagram"></i>
+        <span>@agentgosh</span>
+        <a href="https://www.instagram.com/agentgosh/" target="_blank" rel="noopener noreferrer" class="insta-follow-cta">Follow</a>
+      </div>
+    </div>
+    <div class="insta-grid" id="insta-grid"></div>
   </section>
 </BaseLayout>
 
@@ -294,12 +306,201 @@ const projects = [
     #projects { padding: 3rem 6% 4rem; }
     .project-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── Instagram feed ──────────────────────── */
+  #instagram-feed {
+    padding: 4rem 8% 6rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+  }
+
+  .insta-header {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .insta-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: #9a9aaf;
+    text-decoration: none;
+    cursor: none;
+    margin-top: 0.6rem;
+  }
+
+  .insta-profile-link i {
+    font-size: 1.1rem;
+    color: #c2185b;
+  }
+
+  .insta-follow-cta {
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    cursor: none;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+  }
+
+  .insta-follow-cta:hover {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .insta-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 0.75rem;
+  }
+
+  .insta-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+
+  @media (max-width: 1100px) {
+    .insta-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 700px) {
+    #instagram-feed { padding: 3rem 6% 4rem; }
+    .insta-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+
+<style is:global>
+  /* Instagram feed — dynamically inserted via JS, needs global scope */
+  .insta-card {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    cursor: none;
+    transition: background var(--transition);
+  }
+
+  .insta-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid transparent;
+    transition: border-color var(--transition);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .insta-card:hover { background: var(--surface); }
+  .insta-card:hover::before { border-color: var(--border-hover); }
+  .insta-card:hover .card-sheen { opacity: 1; }
+  .insta-card:hover .insta-thumb img { transform: scale(1.04); }
+  .insta-card:hover .insta-overlay { opacity: 1; }
+
+  .insta-thumb {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+  }
+
+  .insta-thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .insta-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 11, 13, 0.65);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    opacity: 0;
+    transition: opacity var(--transition);
+    z-index: 1;
+  }
+
+  .insta-ig-icon {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.6rem;
+    font-size: 13px;
+    color: var(--muted);
+    opacity: 0.45;
+    z-index: 3;
+    transition: opacity var(--transition), color var(--transition);
+    pointer-events: none;
+  }
+
+  .insta-card:hover .insta-ig-icon {
+    opacity: 0;
+  }
+
+  .insta-view {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .insta-view i {
+    font-size: 13px;
+  }
+
+  .insta-type-badge {
+    font-size: 10px;
+    font-family: "JetBrains Mono", monospace;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .insta-status {
+    grid-column: 1 / -1;
+    padding: 3rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    letter-spacing: 0.1em;
+  }
 </style>
 
 <script>
   import gsap from "gsap";
   import { ScrollTrigger } from "gsap/ScrollTrigger";
-  gsap.registerPlugin(ScrollTrigger);
+  import { ScrollToPlugin }  from "gsap/ScrollToPlugin";
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
   const GLITCH = "!<>-_\\/[]{}—=+*^?#@$%&";
 
@@ -420,24 +621,118 @@ const projects = [
 
     /* ── Card toggle (full card click) ──────────── */
     cards.forEach((card) => {
-      // stop link clicks from toggling the card
-      card.querySelectorAll("a").forEach(a => a.addEventListener("click", e => e.stopPropagation()));
+      // stop link clicks from toggling the card; smooth-scroll hash links
+      card.querySelectorAll("a").forEach(a => a.addEventListener("click", e => {
+        e.stopPropagation();
+        const href = a.getAttribute("href") ?? "";
+        if (href.startsWith("#") && href.length > 1) {
+          e.preventDefault();
+          const target = document.querySelector(href);
+          if (target) gsap.to(window, { scrollTo: { y: target, offsetY: 80 }, duration: 0.9, ease: "power3.inOut" });
+        }
+      }));
 
-      card.addEventListener("click", () => {
+      function handleCardActivate() {
         const isNowActive = card.classList.toggle("active");
         card.setAttribute("aria-expanded", String(isNowActive));
-      });
+      }
 
-      // keyboard support
+      card.addEventListener("click", handleCardActivate);
+
       card.addEventListener("keydown", (e: KeyboardEvent) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          const isNowActive = card.classList.toggle("active");
-          card.setAttribute("aria-expanded", String(isNowActive));
+          handleCardActivate();
         }
       });
     });
   }
 
+  interface InstaPost {
+    id: string;
+    caption: string;
+    media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+    media_url: string;
+    thumbnail_url?: string;
+    permalink: string;
+    timestamp: string;
+  }
+
+  async function initInstagramFeed() {
+    const grid  = document.getElementById("insta-grid");
+    const label = document.getElementById("insta-label");
+    if (!grid) return;
+
+    if (label) {
+      ScrollTrigger.create({
+        trigger: label,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          gsap.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" });
+        },
+      });
+    }
+
+    grid.innerHTML = `<p class="insta-status">loading feed…</p>`;
+
+    try {
+      const res  = await fetch("https://marketing-automation-api.gosvind.workers.dev/api/public/instagram-feed");
+      if (!res.ok) throw new Error("api error");
+      const data = await res.json() as { posts: InstaPost[] };
+      const posts = (data.posts ?? []).slice(0, 12);
+
+      if (!posts.length) {
+        grid.innerHTML = `<p class="insta-status">no posts yet.</p>`;
+        return;
+      }
+
+      grid.innerHTML = posts.map((post) => {
+        const src     = post.media_type === "VIDEO" ? (post.thumbnail_url ?? "") : post.media_url;
+        const badge   = post.media_type === "VIDEO"
+          ? `<span class="insta-type-badge">▶ video</span>`
+          : post.media_type === "CAROUSEL_ALBUM"
+            ? `<span class="insta-type-badge">⊞ album</span>`
+            : "";
+        return `<a href="${post.permalink}" target="_blank" rel="noopener noreferrer" class="insta-card" aria-label="View post on Instagram">
+          <span class="card-sheen"></span>
+          <span class="insta-ig-icon"><i class="fa-brands fa-instagram"></i></span>
+          <div class="insta-thumb">
+            <img src="${src}" alt="" loading="lazy">
+            <div class="insta-overlay">${badge}<span class="insta-view"><i class="fa-brands fa-instagram"></i> View on Instagram ↗</span></div>
+          </div>
+        </a>`;
+      }).join("");
+
+      const cards = grid.querySelectorAll<HTMLElement>(".insta-card");
+
+      gsap.fromTo(cards,
+        { opacity: 0, y: 30, scale: 0.97 },
+        {
+          opacity: 1, y: 0, scale: 1,
+          stagger: { amount: 0.5, from: "start" },
+          duration: 0.55,
+          ease: "power3.out",
+          scrollTrigger: { trigger: grid, start: "top 85%", once: true },
+        }
+      );
+
+      cards.forEach((card) => {
+        const sheen = card.querySelector<HTMLElement>(".card-sheen");
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          if (sheen) {
+            sheen.style.setProperty("--mx", ((e.clientX - rect.left) / rect.width  * 100) + "%");
+            sheen.style.setProperty("--my", ((e.clientY - rect.top)  / rect.height * 100) + "%");
+          }
+        });
+      });
+
+    } catch {
+      grid.innerHTML = `<p class="insta-status">couldn't load feed.</p>`;
+    }
+  }
+
   document.addEventListener("astro:page-load", initProjects);
+  document.addEventListener("astro:page-load", initInstagramFeed);
 </script>
