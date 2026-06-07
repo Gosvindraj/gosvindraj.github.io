@@ -446,9 +446,9 @@ main.home {
 }
 
 .footer-name {
-  font-family: "Gruppo", sans-serif;
-  font-size: 13px;
-  letter-spacing: 0.1em;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
