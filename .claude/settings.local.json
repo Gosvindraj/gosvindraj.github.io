@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv technological-tower/astro.config.mjs .)",
+      "Bash(mv technological-tower/package.json .)",
+      "Bash(mv technological-tower/package-lock.json .)",
+      "Bash(mv technological-tower/tsconfig.json .)",
+      "Bash(mv technological-tower/src .)",
+      "Bash(npx astro:*)",
+      "Bash(npm run:*)",
+      "Bash(rm -rf node_modules/.vite)",
+      "Bash(rm -rf .astro)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

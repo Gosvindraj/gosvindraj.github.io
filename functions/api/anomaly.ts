@@ -95,6 +95,7 @@ function pct(allVals: number[], val: number): number {
 // ── CORS ─────────────────────────────────────────────────────────────────────
 
 const ALLOWED_ORIGINS = [
+  "https://gosvindraj.com",
   "https://gosvindraj.github.io",
   "http://localhost:4321",
   "http://localhost:8788",

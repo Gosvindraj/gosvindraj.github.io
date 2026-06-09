@@ -6,6 +6,6 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://gosvindraj.github.io",
+  site: "https://gosvindraj.com",
   integrations: [react(), sitemap()],
 });
