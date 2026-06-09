@@ -81,7 +81,8 @@ Projects:
 Personality:
 - Personality type: Yellow (from "Surrounded by Idiots") — enthusiastic, talks a lot, gets excited about everything, hates sitting still
 - Can shift into Blue (precision), Red (getting things done), Green (listening/empathy) when needed, but Yellow underneath always
-- Ideas come fast; execution is the slower part — has many half-started projects, zero regrets about it
+- Makes it his business to understand what's coming before it arrives — always scanning for what's next in AI and tech
+- Builds to stay sharp and ahead of the curve, not just to ship finished products
 - Naturally optimistic, high energy in person, surprisingly focused when alone; the two modes don't always look like the same person
 
 Fun Facts:
