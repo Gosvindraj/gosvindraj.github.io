@@ -1,0 +1,136 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout title="GosvindraJ | 404">
+  <section id="not-found">
+    <p class="section-label" id="err-label">Error 404</p>
+    <h1 class="err-heading" id="err-heading">lost.</h1>
+    <p class="err-sub">this page doesn't exist. or it did, and we moved on.</p>
+    <a href="/" class="btn-ghost">back to home</a>
+  </section>
+</BaseLayout>
+
+<style>
+  #not-found {
+    min-height: calc(100vh - var(--nav-height));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: calc(var(--nav-height) + 2rem) 8% 4rem;
+    gap: 1.25rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0;
+  }
+
+  .err-heading {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(5rem, 15vw, 12rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    line-height: 1;
+    opacity: 0;
+    margin: 0;
+  }
+
+  .err-sub {
+    font-size: clamp(0.8rem, 1.4vw, 0.95rem);
+    color: var(--muted);
+    line-height: 1.7;
+    opacity: 0;
+    max-width: 380px;
+  }
+
+  .btn-ghost {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.65rem 1.5rem;
+    border-radius: 2px;
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    cursor: none;
+    opacity: 0;
+    margin-top: 0.5rem;
+  }
+
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: var(--border-hover);
+    background: var(--accent-dim);
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const GLITCH = "!<>-_\\/[]{}=+*^?#@$%&";
+
+  function glitchReveal(el: HTMLElement, finalText: string, duration = 780) {
+    const frames = 18;
+    const ms = Math.round(duration / frames);
+    let frame = 0;
+    el.style.opacity = "1";
+
+    const iv = setInterval(() => {
+      const progress = frame / frames;
+      const revealed = Math.floor(progress * finalText.length);
+      let display = "";
+      for (let i = 0; i < finalText.length; i++) {
+        if (i < revealed) {
+          display += Math.random() < 0.07 * (1 - progress)
+            ? GLITCH[Math.floor(Math.random() * GLITCH.length)]
+            : finalText[i];
+        } else {
+          display += finalText[i] === " " ? " "
+            : GLITCH[Math.floor(Math.random() * GLITCH.length)];
+        }
+      }
+      el.textContent = display;
+      if (frame < frames - 2 && Math.random() < 0.4) {
+        el.style.textShadow = `${+(Math.random()*4-2).toFixed(1)}px 0 rgba(255,0,200,0.6),`
+                            + `${+(Math.random()*-4+2).toFixed(1)}px 0 rgba(0,255,255,0.6)`;
+      } else {
+        el.style.textShadow = "";
+      }
+      frame++;
+      if (frame > frames) {
+        clearInterval(iv);
+        el.textContent = finalText;
+        el.style.textShadow = "";
+      }
+    }, ms);
+  }
+
+  function init404() {
+    const label   = document.getElementById("err-label");
+    const heading = document.getElementById("err-heading");
+    const sub     = document.querySelector<HTMLElement>(".err-sub");
+    const btn     = document.querySelector<HTMLElement>(".btn-ghost");
+    if (!label || !heading) return;
+
+    gsap.fromTo(label,
+      { opacity: 0, x: -16 },
+      { opacity: 1, x: 0, duration: 0.5, ease: "power3.out",
+        onComplete: () => glitchReveal(heading, "lost.", 900)
+      }
+    );
+
+    gsap.timeline({ delay: 0.7 })
+      .fromTo(sub,  { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" })
+      .fromTo(btn,  { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(2)" }, "-=0.2");
+  }
+
+  document.addEventListener("astro:page-load", init404);
+</script>
