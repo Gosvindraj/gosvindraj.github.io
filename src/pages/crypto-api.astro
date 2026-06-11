@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout title="GosvindraJ | BTC Price in MYR">
+<BaseLayout title="Gosvindraj | BTC Price in MYR">
   <section id="project-crypto">
     <div class="project-inner">
 
@@ -21,28 +21,63 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       <div class="crypto-wrap">
         <div class="crypto-card" id="crypto-card">
 
-          <div class="rate-row" id="row-myr">
-            <span class="rate-label">USD / MYR</span>
-            <span class="rate-val" id="rate-myr">—</span>
-          </div>
-          <div class="rate-row" id="row-btc">
-            <span class="rate-label">BTC / USD</span>
-            <span class="rate-val" id="btc-usd">—</span>
+          <div class="card-idle" id="card-idle">
+            <span class="idle-symbol">₿</span>
+            <p class="idle-title">Bitcoin Live Price</p>
+            <p class="idle-hint">price · MYR conversion · 24h range · 7d chart</p>
           </div>
 
-          <div class="divider"></div>
+          <div class="card-body" id="data-rows">
+            <div class="card-left">
+              <div class="rate-row" id="row-myr">
+                <span class="rate-label">USD / MYR</span>
+                <span class="rate-val" id="rate-myr">—</span>
+              </div>
+              <div class="rate-row" id="row-btc">
+                <span class="rate-label">BTC / USD</span>
+                <div class="rate-val-group">
+                  <span class="rate-val" id="btc-usd">—</span>
+                  <span class="change-badge" id="btc-change"></span>
+                </div>
+              </div>
+              <div class="rate-row">
+                <span class="rate-label">BTC / MYR</span>
+                <span class="rate-val" id="btc-myr">—</span>
+              </div>
+              <div class="rate-row">
+                <span class="rate-label">24H HIGH</span>
+                <span class="rate-val val-high" id="btc-high">—</span>
+              </div>
+              <div class="rate-row">
+                <span class="rate-label">24H LOW</span>
+                <span class="rate-val val-low" id="btc-low">—</span>
+              </div>
+            </div>
 
-          <div class="result-row" id="result-row">
-            <span class="result-label">BTC in MYR</span>
-            <span class="result-val" id="btc-myr">—</span>
+            <div class="card-right">
+              <div class="sparkline-wrap">
+                <svg id="sparkline-svg" class="sparkline-svg" preserveAspectRatio="none" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                  <path id="spark-fill" d="" fill="transparent"/>
+                  <path id="spark-line" d="" fill="none" stroke="transparent" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+                </svg>
+                <div class="spark-labels">
+                  <span class="spark-label" id="spark-label-start"></span>
+                  <span class="spark-label spark-label-mid">7d</span>
+                  <span class="spark-label" id="spark-label-end"></span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <button id="fetch-btn" type="button" data-magnetic>
-            <span id="btn-text">Fetch live price</span>
-            <i class="fa-solid fa-arrow-right" id="btn-icon"></i>
-          </button>
+          <div class="card-actions" id="card-actions">
+            <button id="fetch-btn" type="button">
+              <span id="btn-text">Fetch live price</span>
+              <i class="fa-solid fa-arrow-right" id="btn-icon"></i>
+            </button>
+          </div>
 
           <p class="error-msg" id="error-msg"></p>
+          <p class="last-updated" id="last-updated"></p>
         </div>
       </div>
 
@@ -135,7 +170,37 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     flex-direction: column;
     gap: 0;
     width: 100%;
-    max-width: 420px;
+  }
+
+  /* two-column body: data rows left, sparkline right */
+  .card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2rem;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    transition: max-height 0.5s ease, opacity 0.4s ease, margin-bottom 0.4s ease;
+  }
+
+  .card-body.visible {
+    max-height: 500px;
+    opacity: 1;
+    margin-bottom: 0;
+  }
+
+  .card-left {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    padding-right: 2rem;
+  }
+
+  .card-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .rate-row {
@@ -162,52 +227,71 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     letter-spacing: 0.04em;
   }
 
-  .divider {
-    height: 1px;
-    background: var(--border-hover);
-    margin: 1.25rem 0;
-  }
-
-  .result-row {
+  .card-idle {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding-bottom: 1.75rem;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1rem 1.25rem;
+    gap: 0.6rem;
+    transition: opacity 0.3s ease, max-height 0.4s ease;
   }
 
-  .result-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    flex-shrink: 0;
+  .card-idle.hidden {
+    display: none;
   }
 
-  .result-val {
+  .idle-symbol {
     font-family: "Cormorant Garamond", serif;
-    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-size: 3rem;
     font-weight: 300;
-    color: var(--accent);
-    letter-spacing: 0.02em;
-    text-align: right;
+    color: rgba(247, 147, 26, 0.75);
+    text-shadow: 0 0 32px rgba(247, 147, 26, 0.2);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .idle-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+
+  .idle-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 0;
+  }
+
+  .card-actions.fetched {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
   }
 
   #fetch-btn {
-    align-self: flex-start;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.6rem;
+    width: 100%;
     background: none;
-    border: 1px solid var(--border);
-    color: var(--muted);
+    border: 1px solid rgba(247, 147, 26, 0.3);
+    color: rgba(247, 147, 26, 0.7);
     font-family: "Montserrat", sans-serif;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    padding: 0.75rem 1.5rem;
+    padding: 0.9rem 1.5rem;
     border-radius: 2px;
     cursor: none;
     transition: color var(--transition), border-color var(--transition), background var(--transition);
@@ -215,9 +299,93 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   }
 
   #fetch-btn i { font-size: 11px; transition: transform var(--transition); }
-  #fetch-btn:hover { color: var(--text); border-color: var(--border-hover); background: var(--accent-dim); }
+  #fetch-btn:hover { color: rgba(247, 147, 26, 1); border-color: rgba(247, 147, 26, 0.6); background: rgba(247, 147, 26, 0.07); }
+  #fetch-btn:hover i { transform: translateX(4px); }
   #fetch-btn:hover i { transform: translateX(4px); }
   #fetch-btn:disabled { opacity: 0.45; cursor: default; }
+
+  .val-high { color: #4ade80; }
+  .val-low  { color: #f87171; }
+
+  .sparkline-wrap {
+    padding: 0.5rem 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sparkline-svg {
+    width: 100%;
+    height: 100px;
+    display: block;
+    overflow: visible;
+  }
+
+  .spark-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.35rem;
+  }
+
+  .spark-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .spark-label-mid {
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+  }
+
+  .rate-val-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .change-badge {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0.18rem 0.45rem;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .change-badge.pos {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    opacity: 1;
+  }
+
+  .change-badge.neg {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    opacity: 1;
+  }
+
+  .last-updated {
+    margin-top: 0.6rem;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    min-height: 1em;
+  }
+
+  .last-updated.visible { opacity: 1; }
 
   .error-msg {
     display: none;
@@ -230,14 +398,41 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .error-msg.visible { display: block; }
 
   @media (max-width: 900px) {
-    .project-inner { flex-direction: column; gap: 3rem; }
-    .project-header { flex: none; }
+    #project-crypto { align-items: flex-start; }
+    .project-inner { flex-direction: column; gap: 2rem; align-items: center; }
+    .project-header { flex: none; text-align: center; align-items: center; }
+    .back-link { align-self: center; }
+    .crypto-wrap { width: 100%; max-width: 480px; justify-content: center; }
+    .card-body { grid-template-columns: 1fr; }
+    .card-left { border-right: none; padding-right: 0; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 0; }
+    .card-right { padding-top: 1rem; }
+    .sparkline-svg { height: 70px; }
   }
 
   @media (max-width: 500px) {
-    #project-crypto { padding: 3rem 6%; }
+    #project-crypto { padding: 2.5rem 5%; }
     .crypto-card { padding: 1.5rem; }
+    .card-idle { padding: 2rem 1rem 1rem; }
   }
+</style>
+
+<style is:global>
+  body.btc-mode #cursor-dot {
+    background: rgba(247, 147, 26, 0.9);
+  }
+  body.btc-mode #cursor-ring {
+    border-color: rgba(247, 147, 26, 0.35);
+  }
+  body.btc-mode.cursor-hover #cursor-dot {
+    background: rgba(247, 147, 26, 1);
+  }
+  body.btc-mode.cursor-hover #cursor-ring {
+    border-color: rgba(247, 147, 26, 0.65);
+  }
+  body.btc-mode .cursor-trail   { background: rgba(247, 147, 26, 0.5); }
+  body.btc-mode .cursor-spark   { background: rgba(247, 147, 26, 0.9); }
+  body.btc-mode .cursor-ripple  { border-color: rgba(247, 147, 26, 0.6); }
+  body.btc-mode .cursor-streak  { background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.85)); }
 </style>
 
 <script>
@@ -248,24 +443,148 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     const cryptoWrap = document.querySelector<HTMLElement>(".crypto-wrap");
     if (!header || !cryptoWrap) return;
 
-    // entrance
     gsap.fromTo(header,     { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.1 });
     gsap.fromTo(cryptoWrap, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
 
-    const btn      = document.getElementById("fetch-btn")      as HTMLButtonElement;
-    const btnText  = document.getElementById("btn-text")       as HTMLElement;
-    const rateMyr  = document.getElementById("rate-myr")       as HTMLElement;
-    const btcUsd   = document.getElementById("btc-usd")        as HTMLElement;
-    const btcMyr   = document.getElementById("btc-myr")        as HTMLElement;
-    const errorMsg = document.getElementById("error-msg")      as HTMLElement;
+    const btn         = document.getElementById("fetch-btn")    as HTMLButtonElement;
+    const btnText     = document.getElementById("btn-text")     as HTMLElement;
+    const rateMyrEl   = document.getElementById("rate-myr")     as HTMLElement;
+    const btcUsdEl    = document.getElementById("btc-usd")      as HTMLElement;
+    const btcMyrEl    = document.getElementById("btc-myr")      as HTMLElement;
+    const btcHighEl   = document.getElementById("btc-high")     as HTMLElement;
+    const btcLowEl    = document.getElementById("btc-low")      as HTMLElement;
+    const changeBadge = document.getElementById("btc-change")   as HTMLElement;
+    const lastUpdEl   = document.getElementById("last-updated") as HTMLElement;
+    const errorMsg    = document.getElementById("error-msg")    as HTMLElement;
+    const dataRows    = document.getElementById("data-rows")     as HTMLElement;
+    const cardIdle    = document.getElementById("card-idle")     as HTMLElement;
+    const cardActions = document.getElementById("card-actions")  as HTMLElement;
+    const sparkStart  = document.getElementById("spark-label-start") as HTMLElement;
+    const sparkEnd    = document.getElementById("spark-label-end")   as HTMLElement;
     if (!btn) return;
+
+    let curMyr = 0, curBtcUsd = 0, curBtcMyr = 0, curHigh = 0, curLow = 0;
+    let fetchedAt: number | null = null;
+    let tickInterval: ReturnType<typeof setInterval> | null = null;
 
     function fmt(n: number, decimals = 2) {
       return n.toLocaleString("en-MY", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     }
 
-    function flashVal(el: HTMLElement) {
-      gsap.fromTo(el, { color: "var(--accent)" }, { color: "", duration: 0.8, ease: "power2.out" });
+    function rollup(el: HTMLElement, from: number, to: number, decimals: number, prefix = "", keepColor = false) {
+      const counter = { val: from };
+      gsap.to(counter, {
+        val: to,
+        duration: 0.9,
+        ease: "power2.out",
+        onUpdate() { el.textContent = prefix + fmt(counter.val, decimals); },
+        onComplete() { el.textContent = prefix + fmt(to, decimals); },
+      });
+      if (!keepColor) {
+        gsap.fromTo(el, { color: "var(--accent)" }, { color: "", duration: 1.2, ease: "power2.out" });
+      }
+    }
+
+    function setChangeBadge(pct: number) {
+      const sign = pct >= 0 ? "+" : "";
+      changeBadge.textContent = `${sign}${pct.toFixed(2)}%`;
+      changeBadge.className = "change-badge " + (pct >= 0 ? "pos" : "neg");
+    }
+
+    function drawSparkline(prices: number[], isUp: boolean) {
+      if (prices.length < 2) return;
+      const NS = "http://www.w3.org/2000/svg";
+      const svg = document.getElementById("sparkline-svg") as unknown as SVGSVGElement;
+
+      // subsample to ~80 pts for performance while keeping shape
+      const step = Math.max(1, Math.floor(prices.length / 80));
+      const pts_raw = prices.filter((_, i) => i % step === 0 || i === prices.length - 1);
+
+      const min = pts_raw.reduce((a, b) => Math.min(a, b), Infinity);
+      const max = pts_raw.reduce((a, b) => Math.max(a, b), -Infinity);
+      const range = max - min || 1;
+      const padX = 1, padY = 3, W = 100, H = 40;
+
+      const pts = pts_raw.map((p, i) => [
+        padX + (i / (pts_raw.length - 1)) * (W - padX * 2),
+        H - padY - ((p - min) / range) * (H - padY * 2),
+      ] as [number, number]);
+
+      // smooth cardinal spline
+      function smoothPath(points: [number, number][]) {
+        let d = `M${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;
+        const t = 0.25;
+        for (let i = 0; i < points.length - 1; i++) {
+          const p0 = points[Math.max(0, i - 1)];
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          const p3 = points[Math.min(points.length - 1, i + 2)];
+          const cp1x = p1[0] + (p2[0] - p0[0]) * t;
+          const cp1y = p1[1] + (p2[1] - p0[1]) * t;
+          const cp2x = p2[0] - (p3[0] - p1[0]) * t;
+          const cp2y = p2[1] - (p3[1] - p1[1]) * t;
+          d += ` C${cp1x.toFixed(2)} ${cp1y.toFixed(2)},${cp2x.toFixed(2)} ${cp2y.toFixed(2)},${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+        }
+        return d;
+      }
+
+      const linePath = smoothPath(pts);
+      const last = pts[pts.length - 1];
+      const fillPath = `${linePath} L${last[0].toFixed(2)} ${H} L${pts[0][0].toFixed(2)} ${H} Z`;
+      const color = isUp ? "74,222,128" : "248,113,113";
+      const hexColor = isUp ? "#4ade80" : "#f87171";
+
+      // build gradient via createElementNS so Astro scoping can't break the url() ref
+      let defs = svg.querySelector("defs");
+      if (!defs) { defs = document.createElementNS(NS, "defs"); svg.insertBefore(defs, svg.firstChild); }
+      defs.innerHTML = "";
+      const grad = document.createElementNS(NS, "linearGradient");
+      grad.setAttribute("id", "sg"); grad.setAttribute("x1", "0"); grad.setAttribute("y1", "0");
+      grad.setAttribute("x2", "0"); grad.setAttribute("y2", "1");
+      const s1 = document.createElementNS(NS, "stop");
+      s1.setAttribute("offset", "0%"); s1.setAttribute("stop-color", hexColor); s1.setAttribute("stop-opacity", "0.28");
+      const s2 = document.createElementNS(NS, "stop");
+      s2.setAttribute("offset", "100%"); s2.setAttribute("stop-color", hexColor); s2.setAttribute("stop-opacity", "0");
+      grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
+
+      const fillEl = document.getElementById("spark-fill")!;
+      const lineEl = document.getElementById("spark-line")!;
+      fillEl.setAttribute("d", fillPath);
+      fillEl.setAttribute("fill", "url(#sg)");
+      lineEl.setAttribute("d", linePath);
+      lineEl.setAttribute("stroke", `rgba(${color},0.85)`);
+      lineEl.setAttribute("stroke-width", "1.5");
+
+      // endpoint dot
+      let dot = svg.querySelector<SVGCircleElement>("#spark-dot");
+      if (!dot) {
+        dot = document.createElementNS(NS, "circle") as SVGCircleElement;
+        dot.setAttribute("id", "spark-dot");
+        dot.setAttribute("r", "1.8");
+        svg.appendChild(dot);
+      }
+      dot.setAttribute("cx", last[0].toFixed(2));
+      dot.setAttribute("cy", last[1].toFixed(2));
+      dot.setAttribute("fill", hexColor);
+
+      // labels
+      const change7d = ((prices[prices.length - 1] - prices[0]) / prices[0]) * 100;
+      const sign = change7d >= 0 ? "+" : "";
+      sparkStart.textContent = `$${fmt(prices[0], 0)}`;
+      sparkEnd.textContent   = `$${fmt(prices[prices.length - 1], 0)}`;
+      const midEl = document.querySelector<HTMLElement>(".spark-label-mid");
+      if (midEl) midEl.textContent = `${sign}${change7d.toFixed(1)}% · 7d`;
+    }
+
+    function startTick() {
+      if (tickInterval) clearInterval(tickInterval);
+      tickInterval = setInterval(() => {
+        if (!fetchedAt) return;
+        const secs = Math.floor((Date.now() - fetchedAt) / 1000);
+        lastUpdEl.textContent = secs < 60
+          ? `updated ${secs}s ago`
+          : `updated ${Math.floor(secs / 60)}m ago`;
+      }, 1000);
     }
 
     btn.addEventListener("click", async () => {
@@ -274,24 +593,43 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       errorMsg.classList.remove("visible");
 
       try {
-        const [myrRes, btcRes] = await Promise.all([
+        const [myrRes, btcRes, chartRes] = await Promise.all([
           fetch("https://api.exchangerate-api.com/v4/latest/USD"),
-          fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"),
+          fetch("https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false"),
+          fetch("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"),
         ]);
 
-        const [myrData, btcData] = await Promise.all([myrRes.json(), btcRes.json()]);
+        const [myrData, btcData, chartData] = await Promise.all([myrRes.json(), btcRes.json(), chartRes.json()]);
 
         const myrRate   = myrData.rates.MYR as number;
-        const btcPrice  = btcData.bitcoin.usd as number;
+        const md        = btcData.market_data;
+        const btcPrice  = md.current_price.usd as number;
+        const btcChange = md.price_change_percentage_24h as number;
+        const btcHigh   = (md.high_24h.usd as number) * myrRate;
+        const btcLow    = (md.low_24h.usd as number) * myrRate;
         const converted = btcPrice * myrRate;
+        const sparkPrices: number[] = (chartData.prices as [number, number][])?.map(p => p[1]) ?? [];
 
-        rateMyr.textContent = fmt(myrRate, 4);
-        btcUsd.textContent  = `$${fmt(btcPrice, 2)}`;
-        btcMyr.textContent  = `RM ${fmt(converted, 2)}`;
+        rollup(rateMyrEl, curMyr,    myrRate,   4);
+        rollup(btcUsdEl,  curBtcUsd, btcPrice,  2, "$");
+        rollup(btcMyrEl,  curBtcMyr, converted, 2, "RM ");
+        rollup(btcHighEl, curHigh,   btcHigh,   2, "RM ", true);
+        rollup(btcLowEl,  curLow,    btcLow,    2, "RM ", true);
 
-        flashVal(rateMyr);
-        flashVal(btcUsd);
-        flashVal(btcMyr);
+        curMyr = myrRate; curBtcUsd = btcPrice;
+        curHigh = btcHigh; curLow = btcLow; curBtcMyr = converted;
+
+        setChangeBadge(btcChange);
+        if (sparkPrices.length) drawSparkline(sparkPrices, btcChange >= 0);
+        cardIdle.classList.add("hidden");
+        dataRows.classList.add("visible");
+        cardActions.classList.add("fetched");
+
+        fetchedAt = Date.now();
+        lastUpdEl.textContent = "updated just now";
+        lastUpdEl.classList.add("visible");
+        startTick();
+
       } catch {
         errorMsg.textContent = "couldn't reach the APIs. try again.";
         errorMsg.classList.add("visible");
@@ -301,19 +639,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       }
     });
 
-    // magnetic button
-    btn.addEventListener("mousemove", (e) => {
-      const rect = btn.getBoundingClientRect();
-      gsap.to(btn, {
-        x: (e.clientX - rect.left - rect.width  / 2) * 0.4,
-        y: (e.clientY - rect.top  - rect.height / 2) * 0.4,
-        duration: 0.3, ease: "power2.out",
-      });
-    });
-    btn.addEventListener("mouseleave", () => {
-      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1,0.5)" });
-    });
+    // clean up ticker + cursor on page navigation
+    document.addEventListener("astro:before-swap", () => {
+      if (tickInterval) clearInterval(tickInterval);
+      document.body.classList.remove("btc-mode");
+    }, { once: true });
   }
 
-  document.addEventListener("astro:page-load", initCrypto);
+  document.addEventListener("astro:page-load", () => {
+    document.body.classList.add("btc-mode");
+    initCrypto();
+  });
 </script>
