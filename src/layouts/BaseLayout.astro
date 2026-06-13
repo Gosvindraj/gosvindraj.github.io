@@ -11,26 +11,39 @@ interface Props {
   pageClass?: string;
 }
 
-const { title, description = "Personal portfolio of Gosvindraj, developer and AI enthusiast building creative projects.", hideFooter = false, pageClass = "" } = Astro.props;
+const { title, description = "Gosvindraj's space on the internet. Projects, things I'm working on, and everything else that doesn't fit anywhere else.", hideFooter = false, pageClass = "" } = Astro.props;
 
 const siteUrl = "https://gosvindraj.com";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 const ogImage = `${siteUrl}/og-image.png`;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Gosvindraj",
-  "alternateName": "Gosh",
-  "url": siteUrl,
-  "sameAs": [
-    "https://github.com/Gosvindraj",
-    "https://www.linkedin.com/in/gosvindraj-m-3306b9280/",
-    "https://www.instagram.com/gosv7ndraj/"
-  ],
-  "jobTitle": "Developer",
-  "description": "Gosvindraj is a developer and AI enthusiast who builds creative software projects."
-};
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `${siteUrl}/#person`,
+    "name": "Gosvindraj",
+    "alternateName": ["Gosvindraj Munusamy", "Gosh"],
+    "url": siteUrl,
+    "image": `${siteUrl}/og-image.png`,
+    "sameAs": [
+      "https://github.com/Gosvindraj",
+      "https://www.linkedin.com/in/gosvindraj-m-3306b9280/",
+      "https://www.instagram.com/gosv7ndraj/"
+    ],
+    "jobTitle": "Developer",
+    "description": "Gosvindraj's space on the internet. Projects, things I'm working on, and everything else that doesn't fit anywhere else."
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
+    "name": "Gosvindraj",
+    "url": siteUrl,
+    "description": "Personal portfolio of Gosvindraj, developer and AI enthusiast.",
+    "author": { "@id": `${siteUrl}/#person` }
+  }
+];
 ---
 <!doctype html>
 <html lang="en">
