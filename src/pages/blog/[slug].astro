@@ -16,8 +16,23 @@ const { Content } = await render(post);
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
+
+const siteUrl = "https://gosvindraj.com";
+const postUrl = `${siteUrl}/blog/${post.id}`;
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.data.title,
+  "description": post.data.description ?? "",
+  "url": postUrl,
+  "datePublished": post.data.date.toISOString(),
+  "author": { "@id": `${siteUrl}/#person` },
+  "publisher": { "@id": `${siteUrl}/#person` },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
+};
 ---
 <BaseLayout title={`Gosvindraj | ${post.data.title}`} description={post.data.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} slot="head" />
   <section id="post">
     <div class="post-inner">
       <div class="post-header">
@@ -50,6 +65,7 @@ function formatDate(date: Date) {
 
   .post-inner {
     max-width: 680px;
+    margin: 0 auto;
     opacity: 0;
   }
 
@@ -82,9 +98,7 @@ function formatDate(date: Date) {
   }
 
   .post-date {
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
+    font-size: 0.85rem;
     color: var(--muted);
   }
 
@@ -120,6 +134,7 @@ function formatDate(date: Date) {
     font-size: 0.9rem;
     color: var(--text);
     line-height: 1.9;
+    text-align: justify;
   }
 
   .post-body :global(p)      { margin-bottom: 1.4rem; }
