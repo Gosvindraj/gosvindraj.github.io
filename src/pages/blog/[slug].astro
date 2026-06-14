@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -11,7 +11,7 @@ const { slug } = Astro.params;
 const post = await getEntry("blog", slug!);
 if (!post) return Astro.redirect("/blog");
 
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
