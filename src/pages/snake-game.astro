@@ -9,7 +9,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         <p class="section-label">project 01</p>
         <h1 class="project-title">2D Snake Game</h1>
         <p class="project-desc">
-          classic snake, built with vanilla JS and a canvas. use arrow keys to move,
+          classic snake, built with vanilla JS and a canvas. use arrow keys or swipe to move,
           eat the food, don't hit the walls (or yourself).
         </p>
         <a href="/projects" class="back-link">
@@ -26,6 +26,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         </div>
         <canvas id="gameCanvas" width="400" height="400" tabindex="0"></canvas>
         <p class="game-hint" id="game-hint">press <kbd>enter</kbd> to start</p>
+        <div class="dpad" id="dpad">
+          <button class="dpad-btn" id="dpad-up" aria-label="Up"><i class="fa-solid fa-chevron-up"></i></button>
+          <div class="dpad-row">
+            <button class="dpad-btn" id="dpad-left" aria-label="Left"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="dpad-center"></div>
+            <button class="dpad-btn" id="dpad-right" aria-label="Right"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <button class="dpad-btn" id="dpad-down" aria-label="Down"><i class="fa-solid fa-chevron-down"></i></button>
+        </div>
       </div>
 
     </div>
@@ -150,6 +159,53 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     color: var(--text);
   }
 
+  /* D-pad */
+  .dpad {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 0.5rem;
+  }
+
+  .dpad-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dpad-center {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dpad-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .dpad-btn:active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .dpad { display: flex; }
+    .game-hint kbd { display: none; }
+  }
+
   @media (max-width: 900px) {
     .project-inner { flex-direction: column; gap: 3rem; }
     .project-header { flex: none; }
@@ -159,6 +215,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   @media (max-width: 500px) {
     #project-snake { padding: 3rem 6%; }
     canvas { width: 100% !important; height: auto !important; }
+    .game-wrap { align-items: center; }
   }
 </style>
 
@@ -181,6 +238,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     gsap.to(gameWrap, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
     gsap.fromTo(gameWrap, { y: 20 }, { y: 0, duration: 0.6, ease: "power3.out", delay: 0.25 });
 
+    const isTouchDevice = () => window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
     const BOX = 20;
     let snake: { x: number; y: number }[];
     let direction: string;
@@ -191,6 +250,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     let game: ReturnType<typeof setInterval>;
 
     if (hiEl) hiEl.textContent = String(highScore);
+
+    const foodImg = new Image();
+    foodImg.src = "/favicon.svg";
 
     function getRandomFood() {
       let f: { x: number; y: number };
@@ -248,7 +310,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       if (hitWall || hitSelf) {
         clearInterval(game);
         gameState = "gameover";
-        if (hintEl) { hintEl.style.visibility = "visible"; hintEl.innerHTML = `press <kbd>enter</kbd> to play again`; }
+        if (hintEl) { hintEl.style.visibility = "visible"; hintEl.innerHTML = isTouchDevice() ? `tap to play again` : `press <kbd>enter</kbd> to play again`; }
       } else {
         snake.unshift(head);
       }
@@ -266,7 +328,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         ctx.fillText("SNAKE", canvas.width / 2, canvas.height / 2 - 10);
         ctx.fillStyle = "rgba(155,109,206,0.5)";
         ctx.font = "11px 'JetBrains Mono', monospace";
-        ctx.fillText("PRESS ENTER TO START", canvas.width / 2, canvas.height / 2 + 18);
+        ctx.fillText(isTouchDevice() ? "TAP TO START" : "PRESS ENTER TO START", canvas.width / 2, canvas.height / 2 + 18);
         return;
       }
 
@@ -278,11 +340,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         }
       }
 
-      // food — accent purple glow
-      ctx.shadowColor = "rgba(155,109,206,0.8)";
-      ctx.shadowBlur  = 8;
-      ctx.fillStyle   = "rgba(155,109,206,0.9)";
-      ctx.fillRect(food.x + 3, food.y + 3, BOX - 6, BOX - 6);
+      // food — favicon with glow
+      ctx.shadowColor = "rgba(155,109,206,0.9)";
+      ctx.shadowBlur  = 10;
+      if (foodImg.complete && foodImg.naturalWidth > 0) {
+        ctx.drawImage(foodImg, food.x + 1, food.y + 1, BOX - 2, BOX - 2);
+      } else {
+        ctx.fillStyle = "rgba(155,109,206,0.9)";
+        ctx.fillRect(food.x + 3, food.y + 3, BOX - 6, BOX - 6);
+      }
       ctx.shadowBlur  = 0;
 
       // snake
@@ -318,6 +384,46 @@ import BaseLayout from "../layouts/BaseLayout.astro";
         if (e.key === "ArrowDown"  && direction !== "UP")    direction = "DOWN";
       }
     }
+
+    // touch: swipe to change direction, tap to start/restart
+    let touchStartX = 0, touchStartY = 0;
+    canvas.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (gameState === "start" || gameState === "gameover") { startGame(); return; }
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0 && direction !== "LEFT")  direction = "RIGHT";
+        else if (dx < 0 && direction !== "RIGHT") direction = "LEFT";
+      } else {
+        if (dy > 0 && direction !== "UP")   direction = "DOWN";
+        else if (dy < 0 && direction !== "DOWN") direction = "UP";
+      }
+      e.preventDefault();
+    }, { passive: false });
+
+    // d-pad buttons
+    const dpadMap: Record<string, string> = { "dpad-up": "UP", "dpad-down": "DOWN", "dpad-left": "LEFT", "dpad-right": "RIGHT" };
+    Object.entries(dpadMap).forEach(([id, dir]) => {
+      document.getElementById(id)?.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        if (gameState === "playing") {
+          if (dir === "LEFT"  && direction !== "RIGHT") direction = "LEFT";
+          if (dir === "UP"    && direction !== "DOWN")  direction = "UP";
+          if (dir === "RIGHT" && direction !== "LEFT")  direction = "RIGHT";
+          if (dir === "DOWN"  && direction !== "UP")    direction = "DOWN";
+        }
+      }, { passive: false });
+    });
+
+    // update hint and canvas prompt for touch devices
+    if (isTouchDevice() && hintEl) hintEl.innerHTML = `tap canvas to start`;
 
     window.addEventListener("keydown", changeDirection);
     canvas.focus();

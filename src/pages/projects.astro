@@ -100,8 +100,6 @@ const projects = [
   #projects {
     min-height: calc(100vh - var(--nav-height));
     padding: 4rem 8% 6rem;
-    max-width: 1400px;
-    margin: 0 auto;
   }
 
   .projects-header {
@@ -114,7 +112,6 @@ const projects = [
     letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--accent);
-    margin-bottom: 0.5rem;
     opacity: 0;
   }
 
@@ -130,7 +127,7 @@ const projects = [
   /* grid */
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1px;
     border: 1px solid var(--border);
     perspective: 1000px;
@@ -312,8 +309,6 @@ const projects = [
   /* ── Instagram feed ──────────────────────── */
   #instagram-feed {
     padding: 4rem 8% 6rem;
-    max-width: 1400px;
-    margin: 0 auto;
     border-top: 1px solid var(--border);
   }
 
@@ -582,17 +577,8 @@ const projects = [
     const titleText = title?.textContent ?? "Fun projects.";
 
     /* ── Header reveal ───────────────────────── */
-    ScrollTrigger.create({
-      trigger: label,
-      start: "top 85%",
-      once: true,
-      onEnter: () => {
-        gsap.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" });
-        if (title) {
-          setTimeout(() => glitchReveal(title, titleText, 780), 150);
-        }
-      },
-    });
+    gsap.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out", delay: 0.1 });
+    if (title) setTimeout(() => glitchReveal(title, titleText, 780), 250);
 
     /* ── Card scroll reveals ─────────────────── */
     gsap.fromTo(

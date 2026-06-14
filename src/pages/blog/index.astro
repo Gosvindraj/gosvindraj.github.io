@@ -1,0 +1,229 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+---
+<BaseLayout title="Gosvindraj | Blog" description="Opinions, observations, and things I'm working through.">
+  <section id="blog">
+    <div class="blog-header">
+      <p class="section-label">Writing</p>
+      <h2 class="section-title">Brain dump.</h2>
+      <p class="section-sub">opinions, observations, things i'm figuring out. written by me, not AI, so expect imperfections.</p>
+    </div>
+
+    <div class="post-list">
+      {posts.map((post) => (
+        <a href={`/blog/${post.id}`} class="post-row">
+          <div class="post-meta">
+            <span class="post-date">{formatDate(post.data.date)}</span>
+            {post.data.tags && post.data.tags.map((tag: string) => (
+              <span class="post-tag">{tag}</span>
+            ))}
+          </div>
+          <h3 class="post-title">{post.data.title}</h3>
+          {post.data.description && <p class="post-desc">{post.data.description}</p>}
+          <span class="post-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  #blog {
+    min-height: calc(100vh - var(--nav-height));
+    padding: 4rem 8%;
+    max-width: 860px;
+  }
+
+  .blog-header {
+    margin-bottom: 4rem;
+    opacity: 0;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .section-title {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    opacity: 0;
+  }
+
+  .section-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    opacity: 0;
+  }
+
+  .post-row {
+    display: grid;
+    grid-template-columns: 160px 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 2rem;
+    align-items: center;
+    padding: 1.75rem 0;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .post-row:last-child { border-bottom: 1px solid var(--border); }
+
+  .post-meta {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-self: start;
+    padding-top: 0.15rem;
+  }
+
+  .post-date {
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .post-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  .post-title {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    transition: color 0.2s;
+  }
+
+  .post-row:hover .post-title { color: var(--accent); }
+
+  .post-desc {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-top: 0.3rem;
+  }
+
+  .post-arrow {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    font-size: 12px;
+    color: var(--muted);
+    transition: color 0.2s, transform 0.2s;
+    align-self: center;
+  }
+
+  .post-row:hover .post-arrow {
+    color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 600px) {
+    #blog { padding: 4rem 6%; }
+
+    .post-row {
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto auto;
+    }
+
+    .post-meta {
+      grid-column: 1;
+      grid-row: 1;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.6rem;
+      padding-top: 0;
+      margin-bottom: 0.4rem;
+    }
+
+    .post-title { grid-column: 1; grid-row: 2; }
+    .post-desc  { grid-column: 1; grid-row: 3; }
+    .post-arrow { grid-column: 2; grid-row: 1 / 4; }
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+
+  const GLITCH = "!<>-_\\/[]{}—=+*^?#@$%&";
+
+  function glitchReveal(el: HTMLElement, finalText: string, duration = 780) {
+    const frames = 18;
+    const ms = Math.round(duration / frames);
+    let frame = 0;
+    const timer = setInterval(() => {
+      frame++;
+      const progress = frame / frames;
+      const revealed = Math.floor(progress * finalText.length);
+      let display = "";
+      for (let i = 0; i < finalText.length; i++) {
+        if (i < revealed) {
+          display += Math.random() < 0.07 * (1 - progress)
+            ? GLITCH[Math.floor(Math.random() * GLITCH.length)]
+            : finalText[i];
+        } else {
+          display += finalText[i] === " " ? " "
+            : GLITCH[Math.floor(Math.random() * GLITCH.length)];
+        }
+      }
+      el.textContent = display;
+      if (frame >= frames) {
+        clearInterval(timer);
+        el.textContent = finalText;
+      }
+    }, ms);
+  }
+
+  function initBlog() {
+    const header   = document.querySelector<HTMLElement>(".blog-header");
+    const postList = document.querySelector<HTMLElement>(".post-list");
+    const label    = document.querySelector<HTMLElement>(".section-label");
+    const title    = document.querySelector<HTMLElement>(".section-title");
+    const titleText = title?.textContent ?? "";
+
+    gsap.fromTo(header, { opacity: 0 }, { opacity: 1, duration: 0.01 });
+    if (label) gsap.fromTo(label, { opacity: 0, x: -16 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out", delay: 0.1 });
+    if (title) setTimeout(() => { title.style.opacity = "1"; glitchReveal(title, titleText, 780); }, 250);
+    gsap.fromTo(postList, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.5 });
+  }
+
+  document.addEventListener("astro:page-load", initBlog);
+</script>

@@ -493,6 +493,11 @@ main.home {
   * { cursor: auto !important; }
 }
 
+/* ── Shared page components ────────────────────── */
+.section-label {
+  margin-bottom: 1rem;
+}
+
 /* ── Utility ───────────────────────────────────── */
 .sr-only {
   position: absolute;
